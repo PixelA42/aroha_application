@@ -1,0 +1,42 @@
+# Node.js dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Logs
+logs/
+*.log
+*.log.*
+
+# Build files
+build/
+dist/
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Editor and OS files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+
+# React-specific
+*.cache/
+public/static/
+*.env.local
+coverage/
+
+# Backend-specific (if applicable)
+*.sqlite
+*.sqlite3
+*.db
+*.db-journal
+
+# Temporary files
+tmp/
+temp/
