@@ -188,7 +188,7 @@ const Footer = () => {
           <div className="flex flex-col md:flex-row gap-6 items-center justify-between">
             <div className="md:w-1/2">
               <h3 className="text-xl font-semibold mb-2">Stay Connected with Aroha</h3>
-              <p className="text-[#f3eee5]/70">Subscribe for career tips, networking events, and professional opportunities</p>
+              <p className="text-[#f3eee5]/70">Signin for exclusive offers and personalized experience!</p>
             </div>
             <div className="w-full md:w-1/2">
               <div className="flex flex-col sm:flex-row gap-3">

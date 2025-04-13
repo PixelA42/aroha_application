@@ -3,19 +3,19 @@ import { motion } from "framer-motion";
 
 const offers = [
   {
-    title: "Diwali Delights – Upto 40% Off!",
-    description: "Celebrate with exclusive discounts on handcrafted decor, sweets, and festive attire.",
-    image: "https://i.pinimg.com/474x/7d/c3/53/7dc3531a907f14f26882a1a93de6a06f.jpg",
+    title: "Today's Deals – Upto 40% Off!",
+    description: "Grab the best deals on fashion, and home decor.",
+    image: "https://i.pinimg.com/736x/8c/85/24/8c85249192c21449c01d05278c69295a.jpg",
   },
   {
-    title: "Holi Colors Sale – Flat 30% Off!",
-    description: "Splash into savings with discounts on organic colors, ethnic wear, and sweets.",
-    image: "https://i.pinimg.com/474x/9f/e5/af/9fe5afc7fc6ad933ae893e32d551158f.jpg",
+    title: "End of Season Sale – Flat 30% Off!",
+    description: "Refresh your wardrobe with our latest collection at discounted prices.",
+    image: "https://i.pinimg.com/736x/cd/d3/11/cdd31136916db9b6e4dd380db94ceab8.jpg",
   },
   {
-    title: "Christmas Specials – 25% Off!",
-    description: "Enjoy festive deals on handmade gifts, winter wear, and more.",
-    image: "https://i.pinimg.com/474x/91/12/f7/9112f761a0754a533ab701fbc70a17be.jpg",
+    title: "\"House of Indya Specials\" – 25% Off!",
+    description: "Discover House Of Indya wear with a modern twist at exclusive prices.",
+    image: "https://i.pinimg.com/736x/73/4a/ef/734aef3b975210d2bdb1711a2505ad7b.jpg",
   },
 ];
 
