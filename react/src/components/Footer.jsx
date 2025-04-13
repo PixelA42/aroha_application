@@ -144,7 +144,7 @@ const Footer = () => {
             </h3>
             <ul className="space-y-4">
               <li>
-                <a href="mailto:support@udyam.com" className="flex items-center space-x-3 group">
+                <a href="mailto:aroha.com" className="flex items-center space-x-3 group">
                   <span className="h-10 w-10 rounded-full bg-[#f3eee5]/10 flex items-center justify-center group-hover:bg-[#f3eee5]/20 transition-all duration-300">
                     <FaEnvelope className="text-[#251c1a]/70 group-hover:text-[#251c1a] transition-colors duration-300" />
                   </span>
@@ -154,7 +154,7 @@ const Footer = () => {
                 </a>
               </li>
               <li>
-                <a href="tel:+1234567890" className="flex items-center space-x-3 group">
+                <a href="tel:+917508267254" className="flex items-center space-x-3 group">
                   <span className="h-10 w-10 rounded-full bg-[#f3eee5]/10 flex items-center justify-center group-hover:bg-[#f3eee5]/20 transition-all duration-300">
                     <FaPhoneAlt className="text-[#f3eee5]" />
                   </span>
