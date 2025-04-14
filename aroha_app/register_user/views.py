@@ -9,6 +9,16 @@ from .serializers import UserSerializer, AuthTokenSerializer
 class SignUpView(generics.CreateAPIView):
     serializer_class = UserSerializer
 
+    def perform_create(self, serializer):
+        serializer.is_valid(raise_exception=True)  # Ensure validation is triggered
+        serializer.save()  # Save the user to the database
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)  # Trigger validation explicitly
+        self.perform_create(serializer)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
 class SignInView(APIView):
     def post(self, request, *args, **kwargs):
         serializer = AuthTokenSerializer(data=request.data, context={'request': request})

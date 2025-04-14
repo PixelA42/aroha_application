@@ -5,10 +5,14 @@ from .models import User
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'email', 'name', 'password']
+        fields = ['id', 'email', 'name', 'password', 'is_active']  # Include is_active field
         extra_kwargs = {'password': {'write_only': True}}
 
     def create(self, validated_data):
+        if len(validated_data['password']) < 8:
+            raise serializers.ValidationError('Password must be at least 8 characters long.')
+        if len(validated_data['password']) > 20:
+            raise serializers.ValidationError('Password must not exceed 20 characters.')
         return User.objects.create_user(**validated_data)
 
 class AuthTokenSerializer(serializers.Serializer):
