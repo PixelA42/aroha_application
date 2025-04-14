@@ -23,7 +23,11 @@ const Footer = () => {
       setMessage('You are successfully subscribed!');
       setEmail('');
     } catch (error) {
-      setMessage('Subscription failed. Please try again.');
+      if (error.response && error.response.status === 400 && error.response.data.detail === 'Email is already subscribed.') {
+        setMessage('Email is already subscribed.');
+      } else {
+        setMessage('Subscription failed. Please try again.');
+      }
     }
   };
 
