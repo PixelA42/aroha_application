@@ -1,10 +1,34 @@
-import React from 'react';
+import React, { useState } from 'react';
+import axios from 'axios';
 import { FaHome, FaInfoCircle, FaUsers, FaEnvelope, FaPhoneAlt, FaMapMarkerAlt, FaLinkedin, FaTwitter, FaGithub } from 'react-icons/fa';
 import { motion } from 'framer-motion';
 
 const Footer = () => {
+  const [email, setEmail] = useState('');
+  const [message, setMessage] = useState('');
+
+  const isValidEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  const handleSubscribe = async () => {
+    if (!isValidEmail(email)) {
+      setMessage('Please enter a valid email address.');
+      return;
+    }
+
+    try {
+      const response = await axios.post('http://127.0.0.1:8000/api/contact/subscribe/', { email });
+      setMessage('You are successfully subscribed!');
+      setEmail('');
+    } catch (error) {
+      setMessage('Subscription failed. Please try again.');
+    }
+  };
+
   const currentYear = new Date().getFullYear();
-  
+
   // Animation variants
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -188,19 +212,31 @@ const Footer = () => {
           <div className="flex flex-col md:flex-row gap-6 items-center justify-between">
             <div className="md:w-1/2">
               <h3 className="text-xl font-semibold mb-2">Stay Connected with Aroha</h3>
-              <p className="text-[#f3eee5]/70">Signin for exclusive offers and personalized experience!</p>
+              <p className="text-[#f3eee5]/70">Sign in for exclusive offers and personalized experience!</p>
             </div>
             <div className="w-full md:w-1/2">
               <div className="flex flex-col sm:flex-row gap-3">
                 <input 
                   type="email" 
                   placeholder="Your email address" 
+                  value={email} 
+                  onChange={(e) => setEmail(e.target.value)}
                   className="bg-[#f3eee5]/10 border border-[#f3eee5]/20 rounded px-4 py-2.5 text-[#f3eee5] focus:outline-none focus:ring-2 focus:ring-[#f3eee5]/30 w-full"
                 />
-                <button className="bg-[#f3eee5] text-[#251c1a] rounded px-6 py-2.5 font-medium hover:bg-[#f3eee5]/90 transition-colors whitespace-nowrap">
+                <button 
+                  onClick={handleSubscribe}
+                  className="bg-[#f3eee5] text-[#251c1a] rounded px-6 py-2.5 font-medium hover:bg-[#f3eee5]/90 transition-colors whitespace-nowrap"
+                >
                   Subscribe
                 </button>
               </div>
+              {message && (
+                <p className={`mt-3 text-sm ${
+                  message.includes('successfully') ? 'text-green-400' : 'text-red-400'
+                }`}>
+                  {message}
+                </p>
+              )}
             </div>
           </div>
         </motion.div>

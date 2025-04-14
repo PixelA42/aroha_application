@@ -9,11 +9,38 @@ function Contact() {
     subject: '',
     message: ''
   });
+  const [message, setMessage] = useState(''); // State for success/error message
 
-  const handleSubmit = (e) => {
+  const isValidEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Handle form submission here
-    console.log('Form submitted:', formData);
+
+    if (!isValidEmail(formData.email)) {
+      setMessage('Please enter a valid email address.');
+      return;
+    }
+
+    try {
+      const response = await fetch('http://127.0.0.1:8000/api/contact/contact/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
+
+      if (response.ok) {
+        setMessage('Your message has been sent successfully!');
+        setFormData({ name: '', email: '', subject: '', message: '' }); // Clear the form
+      } else {
+        const errorData = await response.json();
+        setMessage(errorData.detail || 'Failed to send message. Please try again.');
+      }
+    } catch (error) {
+      setMessage('A network error occurred. Please try again later.');
+    }
   };
 
   const handleChange = (e) => {
@@ -133,6 +160,17 @@ function Contact() {
             transition={{ duration: 0.8 }}
             className="bg-[#f3eee5] rounded-2xl p-8 shadow-lg"
           >
+            {message && (
+              <motion.div
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className={`p-4 rounded mb-4 ${
+                  message.includes('successfully') ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                }`}
+              >
+                {message}
+              </motion.div>
+            )}
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
                 <label htmlFor="name" className="block text-sm font-medium text-[#251c1a] mb-2">
@@ -211,4 +249,4 @@ function Contact() {
   );
 }
 
-export default Contact; 
+export default Contact;
