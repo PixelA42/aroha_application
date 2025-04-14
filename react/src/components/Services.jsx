@@ -1,7 +1,14 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 
 function Categories() {
+  const navigate = useNavigate();
+
+  const handleShopNow = () => {
+    navigate('/profile');
+  };
+
   const categories = [
     {
       title: 'Clothing',
@@ -100,6 +107,7 @@ function Categories() {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             className="bg-gradient-to-r from-gray-900 to-gray-700 text-white px-8 py-4 rounded-full text-lg font-medium shadow-lg hover:shadow-xl transition-all duration-300"
+            onClick={handleShopNow}
           >
             Shop Now
           </motion.button>

@@ -1,12 +1,21 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { FaSearch, FaUsers, FaNetworkWired, FaArrowRight } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 
 function Hero() {
   const [searchFocus, setSearchFocus] = useState(false);
   const [searchValue, setSearchValue] = useState('');
   const [isHovered, setIsHovered] = useState(false);
   const searchRef = useRef(null);
+  const navigate = useNavigate();
+
+  const handleSearch = () => {
+    if (searchValue.trim()) {
+      navigate(`/categories?search=${encodeURIComponent(searchValue)}`);
+    }
+  };
+
   return (
     <div className="w-full min-h-screen flex items-center justify-center py-20 sm:py-32 relative overflow-hidden" style={{ backgroundColor: '#f3eee5' }}>
       {/* Animated background patterns */}
@@ -157,6 +166,7 @@ function Hero() {
                   className={`ml-2 rounded-full p-4 flex items-center justify-center transition-all ${
                     searchFocus ? 'bg-[#251c1a] text-white' : 'bg-[#251c1a]/10 text-[#251c1a]'
                   }`}
+                  onClick={handleSearch}
                 >
                   <FaSearch className={`${searchFocus ? 'scale-110' : ''} transition-transform`} />
                 </motion.button>

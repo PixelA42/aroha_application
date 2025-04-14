@@ -26,6 +26,11 @@ function SignIn({ onSignIn }) {
         setError('');
 
         try {
+            if (formData.password.length > 20) {
+                setError('Password must not exceed 20 characters');
+                return;
+            }
+
             if (isSignUp) {
                 // Sign Up validation
                 if (!formData.name || !formData.email || !formData.password) {
@@ -251,4 +256,4 @@ function SignIn({ onSignIn }) {
     );
 }
 
-export default SignIn; 
+export default SignIn;
