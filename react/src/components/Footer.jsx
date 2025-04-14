@@ -106,7 +106,7 @@ const Footer = () => {
                 </a>
               </li>
               <li>
-                <a href="#" className="flex items-center space-x-2 group">
+                <a href="#faq" className="flex items-center space-x-2 group">
                   <span className="h-8 w-8 rounded bg-[#f3eee5]/10 flex items-center justify-center group-hover:bg-[#f3eee5]/20 transition-all duration-300">
                     <FaInfoCircle className="text-[#f3eee5]" />
                   </span>
@@ -114,7 +114,7 @@ const Footer = () => {
                 </a>
               </li>
               <li>
-                <a href="#" className="flex items-center space-x-2 group">
+                <a href="#testimonials" className="flex items-center space-x-2 group">
                   <span className="h-8 w-8 rounded bg-[#f3eee5]/10 flex items-center justify-center group-hover:bg-[#f3eee5]/20 transition-all duration-300">
                     <FaUsers className="text-[#f3eee5]" />
                   </span>
@@ -122,7 +122,7 @@ const Footer = () => {
                 </a>
               </li>
               <li>
-                <a href="#" className="flex items-center space-x-2 group">
+                <a href="#contact" className="flex items-center space-x-2 group">
                   <span className="h-8 w-8 rounded bg-[#f3eee5]/10 flex items-center justify-center group-hover:bg-[#f3eee5]/20 transition-all duration-300">
                     <FaEnvelope className="text-[#f3eee5]" />
                   </span>
@@ -174,9 +174,9 @@ const Footer = () => {
               <li>
                 <a href="mailto:aroha.com" className="flex items-center space-x-3 group">
                   <span className="h-10 w-10 rounded-full bg-[#f3eee5]/10 flex items-center justify-center group-hover:bg-[#f3eee5]/20 transition-all duration-300">
-                    <FaEnvelope className="text-[#251c1a]/70 group-hover:text-[#251c1a] transition-colors duration-300" />
+                    <FaEnvelope className="text-[#f3eee5] group-hover:text-[#f3eee5]/90 transition-colors duration-300" />
                   </span>
-                  <span className="text-[#251c1a]/70 group-hover:text-[#251c1a] transition-colors duration-300">
+                  <span className="text-[#f3eee5]/90 group-hover:text-[#f3eee5] transition-colors duration-300">
                     support@aroha.com
                   </span>
                 </a>

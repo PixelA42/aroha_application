@@ -7,7 +7,7 @@ const testimonials = [
     name: 'Ananya Sharma',
     role: 'Customer',
     company: 'Handloom Buyer',
-    image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60',
+    image: 'https://images.unsplash.com/photo-1627296345489-faf81a8f15ae?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
     quote: 'Aroha brings the best of Indian handicrafts! The saree I bought was authentic and beautifully woven. Truly supporting artisans!',
     rating: 5
   },
@@ -15,7 +15,7 @@ const testimonials = [
     name: 'Raj Malhotra',
     role: 'Vendor',
     company: 'Rajasthan Handicrafts',
-    image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60',
+    image: 'https://images.unsplash.com/photo-1599661046289-e31897846e41?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60',
     quote: 'Aroha helped me take my handmade wooden crafts to a nationwide audience. My sales have increased by 300%!',
     rating: 5
   },
@@ -23,7 +23,7 @@ const testimonials = [
     name: 'Meera Iyer',
     role: 'Customer',
     company: 'Spices Enthusiast',
-    image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60',
+    image: 'https://images.unsplash.com/photo-1601585528379-0cfb189fa359?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
     quote: 'The organic masalas I ordered were fresh and aromatic. Aroha is my go-to for authentic Indian spices!',
     rating: 5
   },
