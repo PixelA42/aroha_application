@@ -42,13 +42,14 @@ function Navbar({ user, onSignOut }) {
         { name: 'Contact', icon: null, path: '/#contact' },
         ...(user ? [
             { name: user.name, icon: <FaUser />, path: '/profile' },
-            { name: 'Sign Out', icon: <FaSignOutAlt />, onClick: onSignOut }
+            { name: 'Sign Out', icon: <FaSignOutAlt />, onClick: onSignOut, path: null } // Ensure path is null for actions
         ] : [
             { name: 'Sign In', icon: <FaUser />, path: '/signin' }
         ])
     ];
 
     const isActive = (path) => {
+        if (!path) return false; // Ensure path is defined
         if (path.startsWith('/#')) {
             // For hash links, check if we're on the home page
             return location.pathname === '/' && window.location.hash === path.substring(2);

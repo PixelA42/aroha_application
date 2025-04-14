@@ -52,7 +52,7 @@ function SignIn({ onSignIn }) {
                     email: formData.email,
                     password: formData.password,
                     image: `https://ui-avatars.com/api/?name=${encodeURIComponent(formData.name)}&background=251c1a&color=fff`,
-                    headline: 'Member at Udyam',
+                    headline: 'Member at Aroha',
                     connections: [],
                     posts: [],
                     joinedDate: new Date().toISOString()
