@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { FaUser, FaEnvelope, FaBriefcase, FaGraduationCap, FaUsers, FaCalendarAlt, FaEdit } from 'react-icons/fa';
+import { FaUser, FaEnvelope, FaBriefcase, FaGraduationCap, FaUsers, FaCalendarAlt, FaEdit, FaShoppingCart, FaHeart, FaStar, FaTags } from 'react-icons/fa';
 
 function Profile({ user }) {
     if (!user) {
@@ -111,42 +111,42 @@ function Profile({ user }) {
                             </div>
                         </motion.div>
 
-                        {/* Professional Stats */}
+                        {/* E-commerce Stats */}
                         <motion.div
                             initial={{ opacity: 0, x: 20 }}
                             animate={{ opacity: 1, x: 0 }}
                             transition={{ duration: 0.8, delay: 0.3 }}
                             className="bg-white rounded-2xl shadow-xl p-8"
                         >
-                            <h3 className="text-2xl font-bold text-[#251c1a] mb-6">Professional Stats</h3>
+                            <h3 className="text-2xl font-bold text-[#251c1a] mb-6">E-commerce Stats</h3>
                             <div className="grid grid-cols-2 gap-6">
                                 <div className="text-center">
                                     <div className="w-16 h-16 rounded-xl bg-[#251c1a]/10 flex items-center justify-center mx-auto mb-4">
-                                        <FaUsers className="text-2xl text-[#251c1a]" />
+                                        <FaShoppingCart className="text-2xl text-[#251c1a]" />
                                     </div>
                                     <p className="text-3xl font-bold text-[#251c1a] mb-1">0</p>
-                                    <p className="text-sm text-[#251c1a]/60">Connections</p>
+                                    <p className="text-sm text-[#251c1a]/60">Orders Placed</p>
                                 </div>
                                 <div className="text-center">
                                     <div className="w-16 h-16 rounded-xl bg-[#251c1a]/10 flex items-center justify-center mx-auto mb-4">
-                                        <FaBriefcase className="text-2xl text-[#251c1a]" />
+                                        <FaHeart className="text-2xl text-[#251c1a]" />
                                     </div>
                                     <p className="text-3xl font-bold text-[#251c1a] mb-1">0</p>
-                                    <p className="text-sm text-[#251c1a]/60">Jobs Applied</p>
+                                    <p className="text-sm text-[#251c1a]/60">Wishlist Items</p>
                                 </div>
                                 <div className="text-center">
                                     <div className="w-16 h-16 rounded-xl bg-[#251c1a]/10 flex items-center justify-center mx-auto mb-4">
-                                        <FaGraduationCap className="text-2xl text-[#251c1a]" />
+                                        <FaStar className="text-2xl text-[#251c1a]" />
                                     </div>
                                     <p className="text-3xl font-bold text-[#251c1a] mb-1">0</p>
-                                    <p className="text-sm text-[#251c1a]/60">Courses</p>
+                                    <p className="text-sm text-[#251c1a]/60">Products Reviewed</p>
                                 </div>
                                 <div className="text-center">
                                     <div className="w-16 h-16 rounded-xl bg-[#251c1a]/10 flex items-center justify-center mx-auto mb-4">
-                                        <FaCalendarAlt className="text-2xl text-[#251c1a]" />
+                                        <FaTags className="text-2xl text-[#251c1a]" />
                                     </div>
                                     <p className="text-3xl font-bold text-[#251c1a] mb-1">0</p>
-                                    <p className="text-sm text-[#251c1a]/60">Events</p>
+                                    <p className="text-sm text-[#251c1a]/60">Items in Cart</p>
                                 </div>
                             </div>
                         </motion.div>
@@ -170,4 +170,4 @@ function Profile({ user }) {
     );
 }
 
-export default Profile; 
+export default Profile;
