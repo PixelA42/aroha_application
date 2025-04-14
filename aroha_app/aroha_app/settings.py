@@ -40,9 +40,12 @@ INSTALLED_APPS = [
     'register_user',  # Custom app for user registration
     'rest_framework',  # Django REST Framework for API development
     'rest_framework.authtoken',  # Token authentication for DRF
+    'contactaroha',
+    'corsheaders',  
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',  
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -132,3 +135,10 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.TokenAuthentication',
     ],
 }
+
+# CORS configuration
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:5173',  # Add the React app's URL
+]
+# Optional: Allow all origins (not recommended for production)
+# CORS_ALLOW_ALL_ORIGINS = True
