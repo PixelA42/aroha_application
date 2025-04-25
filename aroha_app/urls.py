@@ -1,5 +1,5 @@
-from django.urls import include
+from django.urls import path, include
 
-urlpatterns += [
+urlpatterns = [
     path('', include('register_user.urls')),
 ]
