@@ -5,6 +5,7 @@ from rest_framework.authtoken.models import Token
 from rest_framework.views import APIView
 from .models import User
 from .serializers import UserSerializer, AuthTokenSerializer
+from django.http import HttpResponse
 
 class SignUpView(generics.CreateAPIView):
     serializer_class = UserSerializer
@@ -26,3 +27,6 @@ class SignInView(APIView):
         user = serializer.validated_data['user']
         token, created = Token.objects.get_or_create(user=user)
         return Response({'token': token.key, 'user': UserSerializer(user).data}, status=status.HTTP_200_OK)
+
+def homepage_view(request):
+    return HttpResponse("Welcome to server homepage")
