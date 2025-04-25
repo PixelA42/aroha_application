@@ -25,89 +25,69 @@ function SignIn({ onSignIn }) {
         e.preventDefault();
         setError('');
 
+        const fieldErrors = {};
+
+        // Frontend quick checks
+        if (!formData.email || !formData.password || (isSignUp && (!formData.name || !formData.confirmPassword))) {
+            setError('Please fill in all fields.');
+            return;
+        }
+
+        if (isSignUp && formData.password !== formData.confirmPassword) {
+            setError('Passwords do not match.');
+            return;
+        }
+
         try {
-            if (formData.password.length > 20) {
-                setError('Password must not exceed 20 characters');
+            const url = isSignUp
+                ? 'http://127.0.0.1:8000/api/auth/signup/'
+                : 'http://127.0.0.1:8000/api/auth/signin/';
+            
+            const payload = isSignUp
+                ? {
+                    name: formData.name,
+                    email: formData.email,
+                    password: formData.password
+                  }
+                : {
+                    email: formData.email,
+                    password: formData.password
+                  };
+
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                // Backend validation errors from DRF
+                if (data && data.errors) {
+                    const messages = [];
+                    for (const [field, messagesArray] of Object.entries(data.errors)) {
+                        messages.push(`${field.charAt(0).toUpperCase() + field.slice(1)}: ${messagesArray.join(' ')}`);
+                    }
+                    setError(messages.join(' | '));
+                } else if (data && data.message) {
+                    setError(data.message);
+                } else {
+                    setError('Something went wrong. Please try again.');
+                }
                 return;
             }
 
+            // Success logic
             if (isSignUp) {
-                // Sign Up validation
-                if (!formData.name || !formData.email || !formData.password) {
-                    setError('All fields are required');
-                    return;
-                }
-
-                if (formData.password !== formData.confirmPassword) {
-                    setError('Passwords do not match');
-                    return;
-                }
-
-                // Check if user exists
-                const existingUsers = JSON.parse(localStorage.getItem('users') || '[]');
-                if (existingUsers.some(user => user.email === formData.email)) {
-                    setError('Email already registered');
-                    return;
-                }
-
-                // Create new user
-                const newUser = {
-                    id: Date.now(),
-                    name: formData.name,
-                    email: formData.email,
-                    password: formData.password,
-                    image: `https://ui-avatars.com/api/?name=${encodeURIComponent(formData.name)}&background=251c1a&color=fff`,
-                    headline: 'Member at Aroha',
-                    connections: [],
-                    posts: [],
-                    joinedDate: new Date().toISOString()
-                };
-
-                // Save to localStorage
-                localStorage.setItem('users', JSON.stringify([...existingUsers, newUser]));
-
-                // Sign in the new user
-                const userData = {
-                    id: newUser.id,
-                    name: newUser.name,
-                    email: newUser.email,
-                    image: newUser.image,
-                    headline: newUser.headline,
-                    connections: newUser.connections,
-                    posts: newUser.posts,
-                    joinedDate: newUser.joinedDate
-                };
-
-                onSignIn(userData);
+                localStorage.setItem('user', JSON.stringify(data.data));
+                onSignIn(data.data);
             } else {
-                // Sign In validation
-                if (!formData.email || !formData.password) {
-                    setError('Email and password are required');
-                    return;
-                }
-
-                // Check credentials
-                const users = JSON.parse(localStorage.getItem('users') || '[]');
-                const user = users.find(u => u.email === formData.email && u.password === formData.password);
-
-                if (!user) {
-                    setError('Invalid email or password');
-                    return;
-                }
-
-                // Sign in the user
-                const userData = {
-                    id: user.id,
-                    name: user.name,
-                    email: user.email,
-                    image: user.image,
-                    headline: user.headline,
-                    connections: user.connections,
-                    posts: user.posts,
-                    joinedDate: user.joinedDate
-                };
-
-                onSignIn(userData);
+                const isNewToken = data.data.is_new_token;
+                localStorage.setItem('token', data.data.token);
+                localStorage.setItem('user', JSON.stringify(data.data.user));
+                onSignIn(data.data.user);
+                console.log(isNewToken ? 'New token created' : 'Token retrieved');
             }
         } catch (err) {
             setError('An error occurred. Please try again.');
@@ -117,9 +97,7 @@ function SignIn({ onSignIn }) {
 
     return (
         <section id="login" className="min-h-screen py-20 bg-[#f3eee5] relative overflow-hidden">
-            {/* Animated background patterns */}
             <div className="absolute inset-0 overflow-hidden">
-                <div className="absolute top-0 left-0 w-full h-full bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGQ9Ik0wIDBoNjB2NjBIMHoiLz48cGF0aCBkPSJNMzYuMjUgMzUuMjVhMi4yNSAyLjI1IDAgMTAwLTQuNSAyLjI1IDIuMjUgMCAwMDAgNC41eiIgZmlsbD0iIzI1MWMxYSIgZmlsbC1vcGFjaXR5PSIuMDUiLz48L2c+PC9zdmc+')] opacity-10"></div>
                 <motion.div 
                     className="absolute inset-0 bg-gradient-to-br from-[#251c1a]/5 via-transparent to-[#3a2e2b]/5"
                     animate={{
@@ -147,7 +125,7 @@ function SignIn({ onSignIn }) {
                                 {isSignUp ? 'Create Account' : 'Welcome Back'}
                             </h2>
                             <p className="text-[#251c1a]/70">
-                                {isSignUp ? 'Join our community of professionals' : 'Sign in to continue'}
+                                {isSignUp ? 'Join our community' : 'Sign in to continue'}
                             </p>
                         </div>
 
@@ -257,3 +235,4 @@ function SignIn({ onSignIn }) {
 }
 
 export default SignIn;
+
