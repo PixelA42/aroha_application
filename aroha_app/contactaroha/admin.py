@@ -1,11 +1,6 @@
 from django.contrib import admin
-from .models import Subscription, Subscriber
+from .models import Subscriber
 from rest_framework.authtoken.models import Token
-
-@admin.register(Subscription)
-class SubscriptionAdmin(admin.ModelAdmin):
-    list_display = ('email', 'created_at')
-    search_fields = ('email',)
 
 @admin.register(Subscriber)
 class SubscriberAdmin(admin.ModelAdmin):
