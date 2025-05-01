@@ -45,7 +45,9 @@ INSTALLED_APPS = [
     'cart.apps.CartConfig',  # Add the cart app here
     'rest_framework',  # Django REST Framework for API development
     'rest_framework.authtoken',  # Token authentication for DRF
-    'corsheaders',  
+    'corsheaders', 
+    'review.apps.ReviewConfig',  # Add the review app here
+    'order.apps.OrderConfig',  # Add the order app here
 ]
 
 MIDDLEWARE = [
