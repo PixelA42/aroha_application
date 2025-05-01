@@ -6,7 +6,7 @@ function Categories() {
   const navigate = useNavigate();
 
   const handleShopNow = () => {
-    navigate('/profile');
+    navigate('/categories'); // Change navigation target to /categories
   };
 
   const categories = [
@@ -107,7 +107,7 @@ function Categories() {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             className="bg-gradient-to-r from-gray-900 to-gray-700 text-white px-8 py-4 rounded-full text-lg font-medium shadow-lg hover:shadow-xl transition-all duration-300"
-            onClick={handleShopNow}
+            onClick={handleShopNow} // This button now navigates to /categories
           >
             Shop Now
           </motion.button>

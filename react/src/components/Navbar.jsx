@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { FaBars, FaTimes, FaUser, FaUsers, FaNetworkWired, FaGraduationCap, FaSignOutAlt } from 'react-icons/fa';
+import { FaBars, FaTimes, FaUser, FaUsers, FaNetworkWired, FaGraduationCap, FaSignOutAlt, FaShoppingCart } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 
 function Navbar({ user, onSignOut }) {
     const [isOpen, setIsOpen] = useState(false);
@@ -33,13 +33,23 @@ function Navbar({ user, onSignOut }) {
         setIsOpen(false);
     };
 
+    const handleServicesClick = () => {
+        console.log('handleServicesClick called, user:', user); // Add this line for debugging
+        if (user) {
+            navigate('/categories');
+        } else {
+            navigate('/signin');
+        }
+        setIsOpen(false); // Close mobile menu
+    };
+
     const navItems = [
         { name: 'Home', icon: null, path: '/' },
-        { name: 'Categories', icon: null, path: '/#services' },
+        { name: 'Services', icon: null, path: '/#services', onClick: handleServicesClick },
         { name: 'Deals', icon: null, path: '/#about' },
         { name: 'Testimonials', icon: null, path: '/#testimonials' },
         { name: 'FAQ', icon: null, path: '/#faq' },
-        { name: 'Contact', icon: null, path: '/#contact' },
+        { name: 'Contact', icon: null, path: '/#contact' }, // Added missing comma here
         ...(user ? [
             { name: user.name, icon: <FaUser />, path: '/profile' },
             { name: 'Sign Out', icon: <FaSignOutAlt />, onClick: onSignOut, path: null } // Ensure path is null for actions
@@ -98,6 +108,12 @@ function Navbar({ user, onSignOut }) {
                                 <span>{item.name}</span>
                             </motion.button>
                         ))}
+                        {/* Cart Icon - Conditionally Rendered */}
+                        {user && (
+                            <Link to="/cart" className="text-[#251c1a] hover:text-[#d97706] transition-colors duration-300">
+                                <FaShoppingCart className="text-2xl" />
+                            </Link>
+                        )}
                     </div>
 
                     {/* Mobile Menu Button */}
@@ -135,6 +151,12 @@ function Navbar({ user, onSignOut }) {
                                         <span>{item.name}</span>
                                     </motion.button>
                                 ))}
+                                {/* Cart Icon - Conditionally Rendered */}
+                                {user && (
+                                    <Link to="/cart" className="text-[#251c1a] hover:text-[#d97706] transition-colors duration-300">
+                                        <FaShoppingCart className="text-2xl" />
+                                    </Link>
+                                )}
                             </div>
                         </motion.div>
                     )}

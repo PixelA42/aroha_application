@@ -80,14 +80,32 @@ function SignIn({ onSignIn }) {
 
             // Success logic
             if (isSignUp) {
-                localStorage.setItem('user', JSON.stringify(data.data));
-                onSignIn(data.data);
-            } else {
-                const isNewToken = data.data.is_new_token;
-                localStorage.setItem('token', data.data.token);
-                localStorage.setItem('user', JSON.stringify(data.data.user));
-                onSignIn(data.data.user);
-                console.log(isNewToken ? 'New token created' : 'Token retrieved');
+                // Option 1: Redirect to sign-in after successful sign-up
+                setIsSignUp(false); // Switch to sign-in view
+                setError('Sign up successful! Please sign in.'); // Inform user
+                // Clear form for sign-in
+                setFormData({ name: '', email: formData.email, password: '', confirmPassword: '' }); 
+
+                // Option 2: If backend returns token on signup, handle it like sign-in
+                // if (data.data.token) { // Check if token exists in signup response
+                //     localStorage.setItem('token', data.data.token);
+                //     localStorage.setItem('user', JSON.stringify(data.data.user)); // Assuming user data is also returned
+                //     onSignIn({ user: data.data.user, token: data.data.token });
+                // } else {
+                //     // Handle signup without immediate login/token
+                // }
+
+            } else { // Sign In successful
+                const { user, token } = data.data; // Destructure user and token
+
+                // Save items to localStorage here (can be redundant if App.jsx does it, but safe)
+                localStorage.setItem('token', token);
+                localStorage.setItem('user', JSON.stringify(user));
+
+                // Pass BOTH user and token to the parent component
+                onSignIn({ user, token }); 
+
+                console.log(data.data.is_new_token ? 'New token created' : 'Token retrieved');
             }
         } catch (err) {
             setError('An error occurred. Please try again.');
