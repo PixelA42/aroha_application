@@ -40,10 +40,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'register_user',  # Custom app for user registration
+    'register_user.apps.RegisterUserConfig',
+    'contactaroha.apps.ContactarohaConfig',
+    'cart.apps.CartConfig',  # Add the cart app here
     'rest_framework',  # Django REST Framework for API development
     'rest_framework.authtoken',  # Token authentication for DRF
-    'contactaroha',
     'corsheaders',  
 ]
 
