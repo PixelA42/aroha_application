@@ -14,10 +14,19 @@ class CartItem(models.Model):
     product = models.CharField(max_length=255)
     quantity = models.PositiveIntegerField(default=1)
     price = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal('0.00')) # Price at time of adding
+    mrp = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True) # Add MRP field
 
     @property
     def total_item_price(self):
         return self.quantity * self.price
+    
+    # Optional: Add property for item savings
+    @property
+    def item_savings(self):
+        if self.mrp and self.mrp > self.price:
+            return (self.mrp - self.price) * self.quantity
+        return Decimal('0.00')
 
     def __str__(self):
-        return f"{self.quantity} x {self.product} @ {self.price} in Cart ({self.cart.id})"
+        mrp_str = f" (MRP: {self.mrp})" if self.mrp else ""
+        return f"{self.quantity} x {self.product} @ {self.price}{mrp_str} in Cart ({self.cart.id})"

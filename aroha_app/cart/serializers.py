@@ -24,7 +24,7 @@ class CartSerializer(serializers.ModelSerializer):
     handling_charge = serializers.SerializerMethodField()
     grand_total = serializers.SerializerMethodField()
     # Optional: Add savings calculation if MRP is available
-    # total_savings = serializers.SerializerMethodField()
+    total_savings = serializers.SerializerMethodField() # <-- Uncomment this
 
     class Meta:
         model = Cart
@@ -36,8 +36,8 @@ class CartSerializer(serializers.ModelSerializer):
             'total_price', 
             'delivery_charge', 
             'handling_charge', 
-            'grand_total'
-            # 'total_savings'
+            'grand_total',
+            'total_savings' # <-- Uncomment this
         ]
         read_only_fields = ['user', 'date_added']
 
@@ -83,10 +83,10 @@ class CartSerializer(serializers.ModelSerializer):
         return str(total + handling + delivery)
 
     # Optional: Implement savings calculation if MRP is added to CartItem
-    # def get_total_savings(self, obj):
-    #     savings = Decimal('0.00')
-    #     for item in obj.items.all():
-    #         if hasattr(item, 'mrp') and item.mrp:
-    #             item_mrp = item.mrp or item.price # Fallback to price if MRP is somehow null
-    #             savings += (item_mrp - item.price) * item.quantity
-    #     return str(savings)
+    def get_total_savings(self, obj): # <-- Uncomment this method
+        savings = Decimal('0.00')
+        if hasattr(obj, 'items') and obj.items.exists(): # Check if items exist
+            for item in obj.items.all():
+                # Use the item_savings property from the model
+                savings += item.item_savings 
+        return str(savings)

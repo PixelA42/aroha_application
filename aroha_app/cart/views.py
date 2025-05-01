@@ -24,44 +24,52 @@ def add_to_cart(request):
         product_id = data.get('product_id') # This is likely the identifier string
         quantity = int(data.get('quantity', 1))
         price = data.get('price') # Price at the time of adding
+        mrp = data.get('mrp') # Get MRP from request data
 
         # Validate required fields from request
-        if not product_id or price is None:
+        if not product_id or price is None: # MRP is optional for savings calculation, but price is needed
             return Response({'error': 'Missing product_id or price'}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
             price_decimal = Decimal(price)
+            mrp_decimal = Decimal(mrp) if mrp is not None else None # Convert MRP if provided
         except Exception:
-             return Response({'error': 'Invalid price format'}, status=status.HTTP_400_BAD_REQUEST)
+             return Response({'error': 'Invalid price or MRP format'}, status=status.HTTP_400_BAD_REQUEST)
 
         cart, created = Cart.objects.get_or_create(user=request.user)
 
         # Use the product_id string directly for the CharField 'product'
-        # Only include fields that exist on CartItem in defaults
+        # Include mrp in defaults
         cart_item, item_created = CartItem.objects.get_or_create(
             cart=cart,
             product=str(product_id), # Use the product_id string here
-            defaults={'quantity': quantity, 'price': price_decimal}
+            defaults={'quantity': quantity, 'price': price_decimal, 'mrp': mrp_decimal} # Add mrp to defaults
         )
 
         if not item_created:
             cart_item.quantity += quantity
-            # Decide if price should be updated if item already exists
+            # Decide if price/mrp should be updated if item already exists
             # cart_item.price = price_decimal # Uncomment if price should update
+            # cart_item.mrp = mrp_decimal # Uncomment if MRP should update
             cart_item.save()
             status_code = status.HTTP_200_OK
             message = 'Item quantity updated in cart'
         else:
-            # Price is already set via defaults
+            # Price and MRP are already set via defaults
             status_code = status.HTTP_201_CREATED
             message = 'Item added to cart'
 
         # Serialize the created/updated item
         item_serializer = CartItemSerializer(cart_item)
 
+        # Fetch the updated cart to return its serialized state including total savings
+        cart.refresh_from_db()
+        cart_serializer = CartSerializer(cart)
+
         return Response({
             'message': message,
-            'cart_item': item_serializer.data # Return serialized item data
+            'cart_item': item_serializer.data, # Return serialized item data
+            'cart': cart_serializer.data # Return updated cart data
         }, status=status_code)
 
     except Exception as e:

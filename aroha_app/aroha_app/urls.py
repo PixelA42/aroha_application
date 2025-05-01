@@ -24,5 +24,6 @@ urlpatterns = [
     path('api/contact/', include('contactaroha.urls')),
     path('api/cart/', include('cart.urls')),
     path('api/order/', include('order.urls')), # Add order urls
+    path('api/reviews/', include('review.urls')), # Review operations
     path('', homepage_view, name='homepage'),
 ]
