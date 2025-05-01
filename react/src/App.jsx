@@ -16,6 +16,10 @@ import ProductDetailPage from './components/ProductDetailPage'; // Import Produc
 import CartPage from './components/CartPage';
 import { motion, AnimatePresence } from 'framer-motion'
 
+// Import react-toastify
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 // Main content component that uses useNavigate
 function MainContent() {
 	const [user, setUser] = useState(null);
@@ -55,6 +59,20 @@ function MainContent() {
 		<>
 			<Navbar user={user} onSignOut={handleSignOut} />
 			
+			{/* Add ToastContainer here */}
+			<ToastContainer 
+				position="top-right"
+				autoClose={3000} // Close after 3 seconds
+				hideProgressBar={false}
+				newestOnTop={false}
+				closeOnClick
+				rtl={false}
+				pauseOnFocusLoss
+				draggable
+				pauseOnHover
+				theme="colored" // Or "light", "dark"
+			/>
+
 			{/* Welcome Message */}
 			<AnimatePresence>
 				{showWelcome && (

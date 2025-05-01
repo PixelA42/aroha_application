@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { FaArrowLeft, FaShoppingCart, FaClock, FaTag, FaStar, FaPaperPlane } from 'react-icons/fa'; // Import FaTag, FaStar, FaPaperPlane
+import { FaArrowLeft, FaShoppingCart, FaClock, FaTag, FaStar, FaPaperPlane } from 'react-icons/fa';
+// Import toast
+import { toast } from 'react-toastify';
 
 // Placeholder function to get product details by ID - replace with actual data fetching
 const getProductById = (id) => {
@@ -56,12 +58,54 @@ function ProductDetailPage() {
   const navigate = useNavigate();
   const product = getProductById(productId);
   const [selectedUnit, setSelectedUnit] = useState(product?.units[0] || null);
-  const [reviewText, setReviewText] = useState(''); // State for review input
+  const [reviewText, setReviewText] = useState('');
+  const [isAdding, setIsAdding] = useState(false); // State to disable button during API call
 
-  const handleAddToCart = () => {
-    if (product && selectedUnit) {
-      console.log(`Adding ${product.name} (${selectedUnit.label}) to cart for ₹${selectedUnit.price}`);
-      // TODO: Implement actual add to cart logic (e.g., update state, call API)
+  const handleAddToCart = async () => {
+    if (!product || !selectedUnit || isAdding) {
+      return; // Don't proceed if product/unit not selected or already adding
+    }
+
+    const token = localStorage.getItem('token');
+    if (!token) {
+      toast.error("Please sign in to add items to your cart.");
+      navigate('/signin'); // Redirect to sign-in page
+      return;
+    }
+
+    setIsAdding(true);
+    try {
+      const response = await fetch('http://127.0.0.1:8000/api/cart/add/', { // Use your backend URL
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Token ${token}`,
+        },
+        body: JSON.stringify({
+          product_id: productId, // Send the product ID from useParams
+          quantity: 1, // Defaulting to 1 for now, adjust if quantity selection is added
+          // Add the missing fields required by the backend
+          product_name: product.name,
+          unit_label: selectedUnit.label,
+          price: selectedUnit.price,
+        }),
+      });
+
+      if (response.ok) {
+        const cartData = await response.json();
+        console.log('Cart updated:', cartData);
+        toast.success(`${product.name} (${selectedUnit.label}) added to cart!`); // Include unit label in toast
+        // Optionally update local cart state or trigger a refresh
+      } else {
+        const errorData = await response.json();
+        console.error('Failed to add to cart:', errorData);
+        toast.error(errorData.error || 'Failed to add item to cart. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error adding to cart:', error);
+      toast.error('An error occurred. Please check your connection and try again.');
+    } finally {
+      setIsAdding(false); // Re-enable button
     }
   };
 
@@ -167,13 +211,14 @@ function ProductDetailPage() {
             {/* Add to Cart Button */}
             <div className="flex items-center space-x-4">
               <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
+                whileHover={{ scale: !isAdding ? 1.05 : 1 }} // Disable hover effect when adding
+                whileTap={{ scale: !isAdding ? 0.95 : 1 }} // Disable tap effect when adding
                 onClick={handleAddToCart}
-                className="bg-gradient-to-r from-[#251c1a] to-[#3a2e2b] text-white px-6 py-3 rounded-lg font-medium shadow-md hover:shadow-lg transition-all duration-300 flex items-center justify-center space-x-2"
+                disabled={isAdding} // Disable button when adding
+                className={`bg-gradient-to-r from-[#251c1a] to-[#3a2e2b] text-white px-6 py-3 rounded-lg font-medium shadow-md hover:shadow-lg transition-all duration-300 flex items-center justify-center space-x-2 ${isAdding ? 'opacity-50 cursor-not-allowed' : ''}`}
               >
                 <FaShoppingCart className="text-xl" />
-                <span>Add to Cart</span>
+                <span>{isAdding ? 'Adding...' : 'Add to Cart'}</span>
               </motion.button>
               {selectedUnit && (
                  <span className="text-2xl font-bold text-[#251c1a]">₹{selectedUnit.price}</span>
