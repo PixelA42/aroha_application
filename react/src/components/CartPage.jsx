@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FaClock, FaTrash, FaPlus, FaMinus, FaInfoCircle, FaRupeeSign, FaShoppingBag, FaFileInvoiceDollar } from 'react-icons/fa';
 import { motion } from 'framer-motion';
+import { toast } from 'react-toastify'; // Import toast
 
 // Placeholder for fetching product image - replace with actual logic if needed
 const getProductImage = (productIdentifier) => {
@@ -22,6 +23,7 @@ function CartPage() {
     const navigate = useNavigate();
     const user = JSON.parse(localStorage.getItem('user')); // Check if user is logged in
     const token = localStorage.getItem('token'); // Get auth token
+    const [isProceeding, setIsProceeding] = useState(false); // State for proceeding notification
 
     const fetchCart = async () => {
         if (!token) {
@@ -119,6 +121,25 @@ function CartPage() {
     useEffect(() => {
         fetchCart();
     }, [token]); // Refetch if token changes (e.g., user logs in/out)
+
+    const handleProceedToCheckout = () => {
+        if (!user) {
+            toast.error("Please log in to proceed.");
+            navigate('/signin');
+            return;
+        }
+        if (loading || isProceeding) return; // Prevent multiple clicks
+
+        setIsProceeding(true);
+        toast.info("Proceeding to Checkout...", { toastId: 'proceeding' }); // Show notification
+
+        // Simulate a small delay if needed, then navigate
+        setTimeout(() => {
+            toast.dismiss('proceeding'); // Dismiss notification
+            navigate('/checkout');
+            setIsProceeding(false); // Reset state
+        }, 500); // Adjust delay as needed
+    };
 
     if (loading && !cart) { // Show initial loading state
         return <div className="min-h-screen flex items-center justify-center bg-gray-100 pt-20">Loading cart...</div>;
@@ -321,12 +342,12 @@ function CartPage() {
 
                             {/* Proceed Button */}
                             <button
-                                onClick={() => user ? navigate('/checkout') : navigate('/signin')} // Navigate based on login status
+                                onClick={handleProceedToCheckout} // Use the new handler
                                 className="w-full bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 transition-colors flex items-center justify-between px-4 disabled:opacity-70 disabled:cursor-not-allowed"
-                                disabled={loading} // Disable button while loading
+                                disabled={loading || isProceeding} // Disable button while loading or proceeding
                             >
                                 <span className="flex items-center"><FaRupeeSign size={12} className="mr-0.5"/>{cart.grand_total} TOTAL</span>
-                                <span>{user ? 'Proceed to Checkout' : 'Login to Proceed'} &gt;</span>
+                                <span>{isProceeding ? 'Loading...' : (user ? 'Proceed to Checkout' : 'Login to Proceed')} &gt;</span>
                             </button>
                         </div>
                     </motion.div>

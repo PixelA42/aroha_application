@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { FaUser, FaEnvelope, FaBriefcase, FaGraduationCap, FaUsers, FaCalendarAlt, FaEdit, FaShoppingCart, FaHeart, FaStar, FaTags } from 'react-icons/fa';
+import { Link } from 'react-router-dom'; // Import Link
+import { FaUser, FaEnvelope, FaBriefcase, FaGraduationCap, FaUsers, FaCalendarAlt, FaEdit, FaShoppingCart, FaHeart, FaStar, FaTags, FaClipboardList } from 'react-icons/fa'; // Added FaClipboardList
 
 function Profile({ user }) {
     if (!user) {
@@ -32,7 +33,7 @@ function Profile({ user }) {
     }
 
     return (
-        <section className="min-h-screen py-20 bg-[#f3eee5] relative overflow-hidden">
+        <section className="min-h-screen py-20 bg-[#f3eee5] relative overflow-hidden pt-24"> {/* Added pt-24 */}
             {/* Animated background patterns */}
             <div className="absolute inset-0 overflow-hidden">
                 <div className="absolute top-0 left-0 w-full h-full bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGQ9Ik0wIDBoNjB2NjBIMHoiLz48cGF0aCBkPSJNMzYuMjUgMzUuMjVhMi4yNSAyLjI1IDAgMTAwLTQuNSAyLjI1IDIuMjUgMCAwMDAgNC41eiIgZmlsbD0iIzI1MWMxYSIgZmlsbC1vcGFjaXR5PSIuMDUiLz48L2c+PC9zdmc+')] opacity-10"></div>
@@ -111,22 +112,15 @@ function Profile({ user }) {
                             </div>
                         </motion.div>
 
-                        {/* E-commerce Stats */}
+                        {/* E-commerce Stats & Actions */}
                         <motion.div
                             initial={{ opacity: 0, x: 20 }}
                             animate={{ opacity: 1, x: 0 }}
                             transition={{ duration: 0.8, delay: 0.3 }}
                             className="bg-white rounded-2xl shadow-xl p-8"
                         >
-                            <h3 className="text-2xl font-bold text-[#251c1a] mb-6">E-commerce Stats</h3>
-                            <div className="grid grid-cols-2 gap-6">
-                                <div className="text-center">
-                                    <div className="w-16 h-16 rounded-xl bg-[#251c1a]/10 flex items-center justify-center mx-auto mb-4">
-                                        <FaShoppingCart className="text-2xl text-[#251c1a]" />
-                                    </div>
-                                    <p className="text-3xl font-bold text-[#251c1a] mb-1">0</p>
-                                    <p className="text-sm text-[#251c1a]/60">Orders Placed</p>
-                                </div>
+                            <h3 className="text-2xl font-bold text-[#251c1a] mb-6">My Account</h3>
+                            <div className="grid grid-cols-2 gap-6 mb-6">
                                 <div className="text-center">
                                     <div className="w-16 h-16 rounded-xl bg-[#251c1a]/10 flex items-center justify-center mx-auto mb-4">
                                         <FaHeart className="text-2xl text-[#251c1a]" />
@@ -141,14 +135,14 @@ function Profile({ user }) {
                                     <p className="text-3xl font-bold text-[#251c1a] mb-1">0</p>
                                     <p className="text-sm text-[#251c1a]/60">Products Reviewed</p>
                                 </div>
-                                <div className="text-center">
-                                    <div className="w-16 h-16 rounded-xl bg-[#251c1a]/10 flex items-center justify-center mx-auto mb-4">
-                                        <FaTags className="text-2xl text-[#251c1a]" />
+                                <Link to="/cart" className="block text-center group">
+                                    <div className="w-16 h-16 rounded-xl bg-[#251c1a]/10 group-hover:bg-[#251c1a]/20 flex items-center justify-center mx-auto mb-4 transition-colors">
+                                        <FaShoppingCart className="text-2xl text-[#251c1a]" />
                                     </div>
-                                    <p className="text-3xl font-bold text-[#251c1a] mb-1">0</p>
-                                    <p className="text-sm text-[#251c1a]/60">Items in Cart</p>
-                                </div>
+                                    <p className="text-sm text-[#251c1a]/60 group-hover:text-[#251c1a]">Items in Cart</p>
+                                </Link>
                             </div>
+                             {/* Add other links/actions if needed */}
                         </motion.div>
                     </div>
 
@@ -164,6 +158,23 @@ function Profile({ user }) {
                             <p className="text-[#251c1a]/60">No recent activity to show</p>
                         </div>
                     </motion.div>
+
+                    {/* My Orders Section (New) */}
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.8, delay: 0.5 }} // Adjusted delay
+                        className="mt-8 bg-white rounded-2xl shadow-xl p-8"
+                    >
+                        <h3 className="text-2xl font-bold text-[#251c1a] mb-6">My Orders</h3>
+                        <div className="text-center">
+                             <Link to="/order-history" className="inline-flex items-center space-x-2 bg-[#251c1a]/10 hover:bg-[#251c1a]/20 text-[#251c1a] px-6 py-3 rounded-lg font-medium transition-colors">
+                                <FaClipboardList />
+                                <span>View Order History</span>
+                            </Link>
+                        </div>
+                    </motion.div>
+
                 </div>
             </div>
         </section>

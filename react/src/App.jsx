@@ -14,6 +14,8 @@ import CategoriesPage from './components/CategoriesPage'
 import ProductListPage from './components/ProductListPage'
 import ProductDetailPage from './components/ProductDetailPage'; // Import ProductDetailPage
 import CartPage from './components/CartPage';
+import CheckoutPage from './components/CheckoutPage'; // Import CheckoutPage
+import OrderHistoryPage from './components/OrderHistoryPage'; // Import OrderHistoryPage
 import { motion, AnimatePresence } from 'framer-motion'
 
 // Import react-toastify
@@ -118,6 +120,9 @@ function MainContent() {
 				<Route path="/profile" element={user ? <Profile user={user} /> : <SignIn onSignIn={handleSignIn} />} />
 				<Route path="/signin" element={<SignIn onSignIn={handleSignIn} />} />
 				<Route path="/cart" element={<CartPage />} /> {/* Add CartPage route */}
+				{/* Add Checkout and Order History Routes */}
+				<Route path="/checkout" element={user ? <CheckoutPage /> : <Navigate to="/signin" replace />} />
+                <Route path="/order-history" element={user ? <OrderHistoryPage /> : <Navigate to="/signin" replace />} />
 			</Routes>
 		</>
 	);
