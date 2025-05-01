@@ -29,17 +29,24 @@ class ReviewSerializer(serializers.ModelSerializer):
         # If the user is authenticated, we don't need reviewer_name from input
         request = self.context.get('request')
         if request and request.user.is_authenticated:
-            if 'reviewer_name' in data:
-                 # Use the authenticated user's name or username
-                 data['reviewer_name'] = request.user.get_full_name() or request.user.username
-            else:
-                 data['reviewer_name'] = request.user.get_full_name() or request.user.username
+            # Always use the authenticated user's actual name
+            data['reviewer_name'] = request.user.name # Use the 'name' field
+            # Assign the user object itself
+            data['user'] = request.user
         elif 'reviewer_name' not in data or not data['reviewer_name']:
             # If user is anonymous, reviewer_name is required
             raise serializers.ValidationError({"reviewer_name": "This field is required for anonymous reviews."})
+        # else: user is anonymous and provided reviewer_name, keep it
 
         # Ensure rating is provided
         if 'rating' not in data:
              raise serializers.ValidationError({"rating": "This field is required."})
+
+        # Check if authenticated user has already reviewed this product
+        if request and request.user.is_authenticated:
+            product_identifier = data.get('product_identifier')
+            user = request.user
+            if Review.objects.filter(product_identifier=product_identifier, user=user).exists():
+                raise serializers.ValidationError("You have already reviewed this product.")
 
         return data

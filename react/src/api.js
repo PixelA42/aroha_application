@@ -1,4 +1,3 @@
-
 import axios from 'axios';
 
 const API_BASE_URL = 'http://127.0.0.1:8000/api'; // Your Django API base URL
@@ -56,4 +55,44 @@ export const fetchCartApi = async () => {
     }
 };
 
-// Add other API functions (like updateQuantity, removeItem) if they aren't defined elsewhere
+// Function to clear the entire cart
+export const clearCartApi = async () => {
+    try {
+        const response = await axios.delete(`${API_BASE_URL}/cart/clear/`, {
+            headers: getAuthHeaders(),
+        });
+        return response.data; // Should contain the empty cart and a message
+    } catch (error) {
+        console.error("Error clearing cart:", error.response?.data || error.message);
+        throw error.response?.data || new Error("Failed to clear cart");
+    }
+};
+
+// Function to update item quantity in the cart
+export const updateCartItemQuantity = async (itemProductId, quantity) => {
+    try {
+        const response = await axios.put(`${API_BASE_URL}/cart/item/${itemProductId}/update/`, 
+            { quantity: quantity },
+            { headers: getAuthHeaders() }
+        );
+        return response.data; // Should contain the updated cart and a message
+    } catch (error) {
+        console.error("Error updating item quantity:", error.response?.data || error.message);
+        throw error.response?.data || new Error("Failed to update item quantity");
+    }
+};
+
+// Function to remove an item from the cart
+export const removeCartItemApi = async (itemProductId) => {
+    try {
+        const response = await axios.delete(`${API_BASE_URL}/cart/item/${itemProductId}/remove/`, {
+            headers: getAuthHeaders(),
+        });
+        return response.data; // Should contain the updated cart and a message
+    } catch (error) {
+        console.error("Error removing item from cart:", error.response?.data || error.message);
+        throw error.response?.data || new Error("Failed to remove item from cart");
+    }
+};
+
+// Add other API functions (like updateQuantity) if they aren't defined elsewhere

@@ -141,3 +141,23 @@ def remove_cart_item(request, item_product_id):
     except Exception as e:
         print(f"Error removing cart item: {e}")
         return Response({'error': 'An unexpected error occurred'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+# --- View: Clear Cart (New) ---
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def clear_cart(request):
+    try:
+        cart = get_object_or_404(Cart, user=request.user)
+        # Delete all items associated with this cart
+        CartItem.objects.filter(cart=cart).delete()
+        # Refresh the cart state (it should now be empty)
+        cart.refresh_from_db()
+        serializer = CartSerializer(cart) # Serialize the now empty cart
+        return Response({'message': 'Cart cleared successfully', 'cart': serializer.data}, status=status.HTTP_200_OK)
+    except Cart.DoesNotExist:
+         # Should not happen if user is authenticated and cart is created on access, but good practice
+         return Response({'error': 'Cart not found'}, status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        print(f"Error clearing cart: {e}")
+        return Response({'error': 'An unexpected error occurred while clearing the cart'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
