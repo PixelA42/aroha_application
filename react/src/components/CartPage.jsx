@@ -229,7 +229,7 @@ function CartPage() {
                             <div className="flex items-center mb-3">
                                 <FaClock className="text-green-600 text-xl mr-3" />
                                 <div>
-                                    <p className="font-semibold text-[#251c1a]">Delivery in 8 minutes</p> {/* Example time */}
+                                    <p className="font-semibold text-[#251c1a]">Delivery in 3 days</p> {/* Changed text */}
                                     <p className="text-sm text-gray-500">Shipment of {cart.items.length} item{cart.items.length !== 1 ? 's' : ''}</p>
                                 </div>
                             </div>

@@ -45,7 +45,7 @@ const dummyProducts = {
       { id: 17, name: 'Toran Door Hanging', brand: 'Gujarat Handicrafts', price: 900, image: 'https://images.unsplash.com/photo-1593079614110-5f1e4f6a7a4c?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=60', description: 'Colorful embroidered Toran for decorating doorways.', units: [{ label: '1 Piece', price: 900, discount: 10, mrp: 1000 }] },
   ],
   'Hershey\'s Cookies n Creme': [ // Example based on image - Replaced with fictional brand
-    { id: 100, name: 'Cookies n Creme Chocolate Bar', brand: 'Malabar Cocoa', price: 128, image: 'https://via.placeholder.com/600x400.png?text=Choco+Bar', description: 'Creamy white chocolate with crunchy cookie pieces.', deliveryTime: '10 MINS', units: [
+    { id: 100, name: 'Cookies n Creme Chocolate Bar', brand: 'Malabar Cocoa', price: 128, image: 'https://via.placeholder.com/600x400.png?text=Choco+Bar', description: 'Creamy white chocolate with crunchy cookie pieces.', deliveryTime: 'Delivery in 3 days', units: [ // Changed delivery time here
         { label: '100 g', price: 128, discount: 14, mrp: 150 },
         { label: '2 x 100 g', price: 252, discount: 16, mrp: 300 }
       ]
