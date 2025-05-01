@@ -9,16 +9,12 @@ class CartItemSerializer(serializers.ModelSerializer):
         model = CartItem
         fields = [
             'id', 
-            'product', 
-            'product_name', 
-            'unit_label', 
+            'product', # The identifier string
             'quantity', 
             'price', 
             'total_item_price'
-            # Add 'mrp' field if you add it to the model later for savings calculation
-            # 'mrp' 
         ]
-        read_only_fields = ['price', 'product_name', 'unit_label'] # Price set when added
+        read_only_fields = [] # Or remove this line if no fields are strictly read-only for the serializer
 
 class CartSerializer(serializers.ModelSerializer):
     items = CartItemSerializer(many=True, read_only=True)

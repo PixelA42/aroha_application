@@ -1,13 +1,12 @@
 from django.shortcuts import render, get_object_or_404
 from django.http import JsonResponse
-# Remove csrf_exempt if using TokenAuthentication and DRF views
-# from django.views.decorators.csrf import csrf_exempt 
-# Remove login_required
-# from django.contrib.auth.decorators import login_required 
 import json
 from .models import Cart, CartItem
-from decimal import Decimal 
-from .serializers import CartSerializer 
+# Remove the top-level import of Product
+# from register_user.models import Product
+from decimal import Decimal
+# Import Serializers
+from .serializers import CartSerializer, CartItemSerializer
 
 # Import DRF decorators and permissions
 from rest_framework.decorators import api_view, permission_classes
@@ -16,158 +15,121 @@ from rest_framework.response import Response # Use DRF Response
 from rest_framework import status # Use DRF status codes
 
 # --- add_to_cart view (Updated with DRF) ---
-# @csrf_exempt # Not needed with DRF/TokenAuth usually
-# @login_required # Replaced by DRF decorators
-@api_view(['POST']) # Specify allowed method
-@permission_classes([IsAuthenticated]) # Require authentication via DRF
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
 def add_to_cart(request):
-    # No need to check request.method == 'POST', @api_view handles it
-    # No need for explicit request.user.is_authenticated check, permission_classes handles it
+    # REMOVE: from register_user.models import Product (Product model doesn't exist there)
     try:
-        # data = json.loads(request.body) # DRF provides request.data
         data = request.data
-        product_id = data.get('product_id')
-        product_name = data.get('product_name')
-        unit_label = data.get('unit_label')
+        product_id = data.get('product_id') # This is likely the identifier string
         quantity = int(data.get('quantity', 1))
-        price = data.get('price')
+        price = data.get('price') # Price at the time of adding
 
-        if not product_id or not product_name or not unit_label or price is None:
-            # Use DRF Response and status
-            return Response({'error': 'Missing product data'}, status=status.HTTP_400_BAD_REQUEST)
+        # Validate required fields from request
+        if not product_id or price is None:
+            return Response({'error': 'Missing product_id or price'}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
             price_decimal = Decimal(price)
         except Exception:
-             # Use DRF Response and status
              return Response({'error': 'Invalid price format'}, status=status.HTTP_400_BAD_REQUEST)
 
         cart, created = Cart.objects.get_or_create(user=request.user)
-        product_variant_identifier = f"{product_id}_{unit_label}"
 
+        # Use the product_id string directly for the CharField 'product'
+        # Only include fields that exist on CartItem in defaults
         cart_item, item_created = CartItem.objects.get_or_create(
             cart=cart,
-            product=product_variant_identifier,
-            defaults={'quantity': quantity, 'price': price_decimal, 'product_name': product_name, 'unit_label': unit_label}
+            product=str(product_id), # Use the product_id string here
+            defaults={'quantity': quantity, 'price': price_decimal}
         )
 
         if not item_created:
             cart_item.quantity += quantity
+            # Decide if price should be updated if item already exists
+            # cart_item.price = price_decimal # Uncomment if price should update
             cart_item.save()
             status_code = status.HTTP_200_OK
             message = 'Item quantity updated in cart'
         else:
+            # Price is already set via defaults
             status_code = status.HTTP_201_CREATED
             message = 'Item added to cart'
 
-        # Use DRF Response
+        # Serialize the created/updated item
+        item_serializer = CartItemSerializer(cart_item)
+
         return Response({
             'message': message,
-            'cart_item': { # Consider using CartItemSerializer here for consistency
-                'product': cart_item.product,
-                'product_name': cart_item.product_name,
-                'unit_label': cart_item.unit_label,
-                'quantity': cart_item.quantity,
-                'price': str(cart_item.price)
-            }
+            'cart_item': item_serializer.data # Return serialized item data
         }, status=status_code)
 
-    # except json.JSONDecodeError: # Not needed if using request.data
     except Exception as e:
-        print(f"Error adding to cart: {e}")
-        # Use DRF Response and status
-        return Response({'error': 'An unexpected error occurred'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-    # No need for else block for method check
+        print(f"Error adding to cart: {e}") # Log the error
+        # Return a more specific error if possible, otherwise generic
+        return Response({'error': f'An unexpected error occurred: {e}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 # --- View: Get Cart Details (Updated with DRF) ---
-# @login_required # Replaced by DRF decorators
-@api_view(['GET']) # Specify allowed method
-@permission_classes([IsAuthenticated]) # Require authentication
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def view_cart(request):
-    # No need to check request.method == 'GET'
     try:
         cart, created = Cart.objects.get_or_create(user=request.user)
-        serializer = CartSerializer(cart) 
-        # Use DRF Response
-        return Response(serializer.data) 
+        serializer = CartSerializer(cart)
+        return Response(serializer.data)
     except Exception as e:
         print(f"Error viewing cart: {e}")
-        # Use DRF Response and status
         return Response({'error': 'An unexpected error occurred'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-    # No need for else block for method check
 
 # --- View: Update Cart Item Quantity (Updated with DRF) ---
-# @csrf_exempt # Not needed
-# @login_required # Replaced
-@api_view(['PUT']) # Specify allowed method
-@permission_classes([IsAuthenticated]) # Require authentication
-def update_cart_item(request, item_product_id): 
-    # No need to check request.method == 'PUT'
+@api_view(['PUT']) # Should likely be PATCH or PUT
+@permission_classes([IsAuthenticated])
+def update_cart_item(request, item_product_id):
+    # REMOVE: from register_user.models import Product
     try:
-        # data = json.loads(request.body) # Use request.data
         data = request.data
         new_quantity = int(data.get('quantity'))
 
-        if new_quantity <= 0:
-            # If quantity is 0 or less, remove the item
-            # Duplicate removal logic here for simplicity
-             cart = get_object_or_404(Cart, user=request.user)
-             cart_item = get_object_or_404(CartItem, cart=cart, product=item_product_id)
-             cart_item.delete()
-             # Recalculate cart totals after deletion
-             cart.refresh_from_db() # Ensure cart object reflects the deletion
-             serializer = CartSerializer(cart)
-             return Response({'message': 'Cart item removed due to zero quantity', 'cart': serializer.data}, status=status.HTTP_200_OK)
-
-
         cart = get_object_or_404(Cart, user=request.user)
-        cart_item = get_object_or_404(CartItem, cart=cart, product=item_product_id) 
+        # Query CartItem using the product CharField directly
+        cart_item = get_object_or_404(CartItem, cart=cart, product=str(item_product_id))
 
-        cart_item.quantity = new_quantity
-        cart_item.save()
-        
-        # Recalculate cart totals after update
-        cart.refresh_from_db() # Ensure cart object reflects the update
-        serializer = CartSerializer(cart)
-        # Use DRF Response
-        return Response({'message': 'Cart item updated', 'cart': serializer.data}, status=status.HTTP_200_OK)
+        if new_quantity <= 0:
+            cart_item.delete()
+            cart.refresh_from_db()
+            serializer = CartSerializer(cart)
+            return Response({'message': 'Cart item removed due to zero quantity', 'cart': serializer.data}, status=status.HTTP_200_OK)
+        else:
+            cart_item.quantity = new_quantity
+            cart_item.save()
+            cart.refresh_from_db()
+            serializer = CartSerializer(cart)
+            return Response({'message': 'Cart item updated', 'cart': serializer.data}, status=status.HTTP_200_OK)
 
     except CartItem.DoesNotExist:
-         # Use DRF Response and status
          return Response({'error': 'Item not found in cart'}, status=status.HTTP_404_NOT_FOUND)
-    # except json.JSONDecodeError: # Not needed
-    #     return Response({'error': 'Invalid JSON'}, status=status.HTTP_400_BAD_REQUEST)
     except Exception as e:
         print(f"Error updating cart item: {e}")
-        # Use DRF Response and status
         return Response({'error': 'An unexpected error occurred'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-    # No need for else block for method check
 
 
 # --- View: Remove Cart Item (Updated with DRF) ---
-# @csrf_exempt # Not needed
-# @login_required # Replaced
-@api_view(['DELETE']) # Specify allowed method
-@permission_classes([IsAuthenticated]) # Require authentication
-def remove_cart_item(request, item_product_id): 
-    # No need for is_internal_call or method check
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def remove_cart_item(request, item_product_id):
+    # REMOVE: from register_user.models import Product
     try:
         cart = get_object_or_404(Cart, user=request.user)
-        cart_item = get_object_or_404(CartItem, cart=cart, product=item_product_id) 
-        
+        # Query CartItem using the product CharField directly
+        cart_item = get_object_or_404(CartItem, cart=cart, product=str(item_product_id))
+
         cart_item.delete()
-        
-        # Recalculate cart totals after deletion
-        cart.refresh_from_db() # Ensure cart object reflects the deletion
+        cart.refresh_from_db()
         serializer = CartSerializer(cart)
-        # Use DRF Response
         return Response({'message': 'Cart item removed successfully', 'cart': serializer.data}, status=status.HTTP_200_OK)
 
     except CartItem.DoesNotExist:
-         # Use DRF Response and status
          return Response({'error': 'Item not found in cart'}, status=status.HTTP_404_NOT_FOUND)
     except Exception as e:
         print(f"Error removing cart item: {e}")
-        # Use DRF Response and status
         return Response({'error': 'An unexpected error occurred'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-    # No need for else block for method check
