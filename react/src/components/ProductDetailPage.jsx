@@ -1,8 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { FaArrowLeft, FaShoppingCart, FaClock, FaTag, FaStar, FaPaperPlane } from 'react-icons/fa';
-// Import toast
+import { FaStar, FaRegStar, FaShoppingCart, FaPlus, FaMinus, FaChevronDown, FaChevronUp, FaCommentDots, FaTimes, FaPaperPlane } from 'react-icons/fa'; // Added icons
+import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'react-toastify';
 
 // Placeholder function to get product details by ID - replace with actual data fetching
@@ -56,12 +55,91 @@ const dummyProducts = {
 function ProductDetailPage() {
   const { productId } = useParams();
   const navigate = useNavigate();
-  const product = getProductById(productId);
-  const [selectedUnit, setSelectedUnit] = useState(product?.units[0] || null);
-  const [reviewText, setReviewText] = useState('');
-  const [isAdding, setIsAdding] = useState(false); // State to disable button during API call
+  const [product, setProduct] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [selectedUnit, setSelectedUnit] = useState(null);
+  const [isAdding, setIsAdding] = useState(false); // State for add to cart button
+  const [showFullDescription, setShowFullDescription] = useState(false);
 
+  // --- Review State ---
+  const [reviews, setReviews] = useState([]);
+  const [loadingReviews, setLoadingReviews] = useState(false);
+  const [reviewError, setReviewError] = useState(null);
+  const [showReviewForm, setShowReviewForm] = useState(false);
+  const [reviewerName, setReviewerName] = useState('');
+  const [rating, setRating] = useState(0); // 0 means no rating selected
+  const [reviewText, setReviewText] = useState('');
+  const [isSubmittingReview, setIsSubmittingReview] = useState(false);
+  // --- End Review State ---
+
+  const user = JSON.parse(localStorage.getItem('user')); // Get user info
+  const token = localStorage.getItem('token'); // Get auth token
+
+  // Fetch Product Details
+  useEffect(() => {
+    const fetchProduct = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        // Simulate network delay
+        await new Promise(resolve => setTimeout(resolve, 500));
+
+        // --- Use the existing getProductById function --- 
+        const fetchedProduct = getProductById(productId);
+        // --- End of Reverted Logic --- 
+
+        if (fetchedProduct) {
+          setProduct(fetchedProduct);
+          // Default to the first unit if available
+          if (fetchedProduct.units && fetchedProduct.units.length > 0) {
+            setSelectedUnit(fetchedProduct.units[0]);
+          }
+        } else {
+          setError('Product not found.');
+        }
+      } catch (e) {
+        console.error("Failed to fetch product:", e);
+        setError('Failed to load product details.');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProduct();
+  }, [productId]);
+
+  // --- Fetch Reviews ---
+  useEffect(() => {
+    const fetchReviews = async () => {
+      if (!productId) return;
+      setLoadingReviews(true);
+      setReviewError(null);
+      try {
+        // Use the actual product ID from the state if available, or from params
+        const identifier = product ? product.id : productId;
+        const response = await fetch(`http://127.0.0.1:8000/api/reviews/product/${identifier}/`);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        setReviews(data);
+      } catch (e) {
+        console.error("Failed to fetch reviews:", e);
+        setReviewError('Could not load reviews.');
+      } finally {
+        setLoadingReviews(false);
+      }
+    };
+    // Fetch reviews only after product is loaded to ensure we have the correct ID
+    if (product) {
+        fetchReviews();
+    }
+  }, [product, productId]); // Depend on product state
+  // --- End Fetch Reviews ---
+
+  // --- Handle Add to Cart ---
   const handleAddToCart = async () => {
+    // ... (existing handleAddToCart logic remains the same) ...
     if (!product || !selectedUnit || isAdding) {
       return; // Don't proceed if product/unit not selected or already adding
     }
@@ -75,6 +153,8 @@ function ProductDetailPage() {
 
     setIsAdding(true);
     try {
+      // Use product.id which should be correctly set now
+      const productIdString = `${product.id}_${selectedUnit.label}`;
       const response = await fetch('http://127.0.0.1:8000/api/cart/add/', { // Use your backend URL
         method: 'POST',
         headers: {
@@ -82,18 +162,17 @@ function ProductDetailPage() {
           'Authorization': `Token ${token}`,
         },
         body: JSON.stringify({
-          product_id: productId, // Send the product ID from useParams
+          product_id: productIdString, // Combine product ID and unit label
           quantity: 1, // Defaulting to 1 for now, adjust if quantity selection is added
-          // Add the missing fields required by the backend
           product_name: product.name,
           unit_label: selectedUnit.label,
           price: selectedUnit.price,
+          mrp: selectedUnit.mrp // <-- Add this line to send MRP
         }),
       });
 
       if (response.ok) {
         const cartData = await response.json();
-        console.log('Cart updated:', cartData);
         toast.success(`${product.name} (${selectedUnit.label}) added to cart!`); // Include unit label in toast
         // Optionally update local cart state or trigger a refresh
       } else {
@@ -108,23 +187,127 @@ function ProductDetailPage() {
       setIsAdding(false); // Re-enable button
     }
   };
+  // --- End Handle Add to Cart ---
+
+  // --- Review Form Handlers ---
+  const handleRating = (rate) => {
+    setRating(rate);
+  };
 
   const handleReviewChange = (e) => {
     setReviewText(e.target.value);
   };
 
-  const handleSubmitReview = () => {
-    if (reviewText.trim()) {
-      console.log(`Submitting review for product ${productId}: ${reviewText}`);
-      // TODO: Implement actual review submission logic (call API)
-      setReviewText(''); // Clear textarea after submission
-    } else {
-      console.log('Review cannot be empty.');
-      // Optionally show an error message to the user
-    }
+  const handleNameChange = (e) => {
+    setReviewerName(e.target.value);
   };
 
+  const handleSubmitReview = async (e) => {
+    e.preventDefault();
+    if (rating === 0) {
+      toast.error("Please select a rating (1-5 stars).");
+      return;
+    }
+    if (!reviewText.trim()) {
+      toast.error("Please write your review.");
+      return;
+    }
+    if (!user && !reviewerName.trim()) {
+        toast.error("Please enter your name.");
+        return;
+    }
+
+    setIsSubmittingReview(true);
+    setReviewError(null);
+
+    const reviewData = {
+        product_identifier: product.id.toString(), // Use the actual product ID
+        rating: rating,
+        text: reviewText,
+        // Only include reviewer_name if the user is not logged in
+        ...( !user && { reviewer_name: reviewerName.trim() } )
+    };
+
+    try {
+        const response = await fetch('http://127.0.0.1:8000/api/reviews/create/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                // Include Authorization header only if user is logged in
+                ...(token && { 'Authorization': `Token ${token}` })
+            },
+            body: JSON.stringify(reviewData),
+        });
+
+        if (response.ok) {
+            const newReview = await response.json();
+            // Add the new review to the top of the list
+            setReviews([newReview, ...reviews]);
+            toast.success("Review submitted successfully!");
+            // Reset form and hide it
+            setRating(0);
+            setReviewText('');
+            setReviewerName(''); // Clear name field too
+            setShowReviewForm(false);
+        } else {
+            const errorData = await response.json();
+            console.error('Failed to submit review:', errorData);
+            // Construct a user-friendly error message
+            let errorMessage = "Failed to submit review.";
+            if (errorData.rating) errorMessage += ` Rating: ${errorData.rating.join(' ')}`;
+            if (errorData.text) errorMessage += ` Review: ${errorData.text.join(' ')}`;
+            if (errorData.reviewer_name) errorMessage += ` Name: ${errorData.reviewer_name.join(' ')}`;
+            if (errorData.detail) errorMessage = errorData.detail; // General error from backend
+            toast.error(errorMessage);
+            setReviewError(errorMessage); // Keep error state for potential display
+        }
+    } catch (error) {
+        console.error('Error submitting review:', error);
+        toast.error('An network error occurred. Please try again.');
+        setReviewError('An network error occurred.');
+    } finally {
+        setIsSubmittingReview(false);
+    }
+  };
+  // --- End Review Form Handlers ---
+
+
+  // --- Helper Functions ---
+  const renderStars = (ratingValue) => {
+    const stars = [];
+    for (let i = 1; i <= 5; i++) {
+      stars.push(
+        <FaStar key={i} className={i <= ratingValue ? 'text-yellow-500' : 'text-gray-300'} />
+      );
+    }
+    return <div className="flex">{stars}</div>;
+  };
+
+  const formatDate = (dateString) => {
+    const options = { year: 'numeric', month: 'short', day: 'numeric' };
+    return new Date(dateString).toLocaleDateString(undefined, options);
+  };
+  // --- End Helper Functions ---
+
+
+  if (loading) {
+    return (
+      <section className="min-h-screen py-20 bg-[#f3eee5] pt-24 flex items-center justify-center">
+        <p className="text-xl text-[#251c1a]/70">Loading product...</p>
+      </section>
+    );
+  }
+
+  if (error) {
+    return (
+      <section className="min-h-screen py-20 bg-[#f3eee5] pt-24 flex items-center justify-center">
+        <p className="text-xl text-red-600">{error}</p>
+      </section>
+    );
+  }
+
   if (!product) {
+    // This case might be redundant if error handles 'Product not found'
     return (
       <section className="min-h-screen py-20 bg-[#f3eee5] pt-24 flex items-center justify-center">
         <p className="text-xl text-[#251c1a]/70">Product not found.</p>
@@ -132,131 +315,246 @@ function ProductDetailPage() {
     );
   }
 
-  return (
-    <section className="min-h-screen py-20 bg-[#f3eee5] pt-24">
-      <div className="container mx-auto px-6 sm:px-8">
-        {/* Back Button */}
-        <motion.button
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.5 }}
-          onClick={() => navigate(-1)} // Go back to the previous page
-          className="flex items-center space-x-2 text-[#251c1a] hover:text-[#d97706] transition-colors mb-6"
-        >
-          <FaArrowLeft />
-          <span>Back</span>
-        </motion.button>
+  // Calculate average rating
+  const averageRating = reviews.length > 0
+    ? (reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length)
+    : 0;
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-12"> {/* Added mb-12 */}
+  return (
+    <section className="min-h-screen py-10 bg-[#f3eee5] pt-24">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
           {/* Product Image */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.8 }}
-            className="bg-white rounded-lg shadow-md overflow-hidden"
+            initial={{ opacity: 0, x: -50 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5 }}
+            className="bg-white p-4 rounded-lg shadow-md flex justify-center items-center"
           >
-            <img
-              src={product.image}
-              alt={product.name}
-              className="w-full h-auto object-contain p-4" // Use contain to show full image
-            />
+            <img src={product.image} alt={product.name} className="max-h-[400px] object-contain" />
           </motion.div>
 
           {/* Product Details */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
+            initial={{ opacity: 0, x: 50 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+            className="bg-white p-6 rounded-lg shadow-md flex flex-col justify-between"
           >
-            {/* Brand Name */}
-            {product.brand && (
-              <div className="flex items-center text-sm text-[#d97706] mb-2 font-semibold">
-                <FaTag className="mr-1.5" />
-                <span>{product.brand}</span>
+            <div>
+              <h1 className="text-3xl font-bold text-[#251c1a] mb-2">{product.name}</h1>
+              <div className="flex items-center space-x-2 mb-4 text-sm text-gray-500">
+                <span>Category: {product.category}</span>
+                <span>|</span>
+                <span>Brand: {product.brand}</span>
+                <span>|</span>
+                <span>Origin: {product.origin}</span>
               </div>
-            )}
-            <h1 className="text-4xl font-bold text-[#251c1a] mb-3">{product.name}</h1>
-            {product.deliveryTime && (
-              <div className="flex items-center text-sm text-gray-500 mb-4">
-                <FaClock className="mr-1" /> {product.deliveryTime}
-              </div>
-            )}
-            <p className="text-[#251c1a]/70 mb-6 text-lg">{product.description}</p>
 
-            {/* Unit Selection */}
-            <div className="mb-6">
-              <h3 className="text-lg font-semibold text-[#251c1a] mb-3">Select Unit</h3>
-              <div className="flex flex-wrap gap-3">
-                {product.units.map((unit, index) => (
-                  <button
-                    key={index}
-                    onClick={() => setSelectedUnit(unit)}
-                    className={`border rounded-lg p-3 text-left transition-all duration-200 ${selectedUnit === unit ? 'border-[#d97706] bg-[#fffaf0] ring-2 ring-[#d97706]' : 'border-gray-300 bg-white hover:border-gray-400'}`}
-                  >
-                    {unit.discount && (
-                      <span className="block text-xs font-semibold text-green-600 mb-1">{unit.discount}% OFF</span>
-                    )}
-                    <span className="block font-medium text-[#251c1a]">{unit.label}</span>
-                    <div className="flex items-baseline space-x-2 mt-1">
-                      <span className="text-xl font-bold text-[#d97706]">₹{unit.price}</span>
-                      {unit.mrp && unit.mrp > unit.price && (
-                        <span className="text-sm text-gray-500 line-through">MRP ₹{unit.mrp}</span>
-                      )}
-                    </div>
-                  </button>
-                ))}
-              </div>
-            </div>
+              {/* Average Rating Display */}
+              {reviews.length > 0 && (
+                <div className="flex items-center mb-4">
+                  {renderStars(averageRating)}
+                  <span className="ml-2 text-gray-600 text-sm">({averageRating.toFixed(1)} average rating from {reviews.length} review{reviews.length !== 1 ? 's' : ''})</span>
+                </div>
+              )}
 
-            {/* Add to Cart Button */}
-            <div className="flex items-center space-x-4">
-              <motion.button
-                whileHover={{ scale: !isAdding ? 1.05 : 1 }} // Disable hover effect when adding
-                whileTap={{ scale: !isAdding ? 0.95 : 1 }} // Disable tap effect when adding
-                onClick={handleAddToCart}
-                disabled={isAdding} // Disable button when adding
-                className={`bg-gradient-to-r from-[#251c1a] to-[#3a2e2b] text-white px-6 py-3 rounded-lg font-medium shadow-md hover:shadow-lg transition-all duration-300 flex items-center justify-center space-x-2 ${isAdding ? 'opacity-50 cursor-not-allowed' : ''}`}
-              >
-                <FaShoppingCart className="text-xl" />
-                <span>{isAdding ? 'Adding...' : 'Add to Cart'}</span>
-              </motion.button>
+              {/* Unit Selection */}
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-1">Select Unit:</label>
+                <div className="flex flex-wrap gap-2">
+                  {product.units.map((unit) => (
+                    <button
+                      key={unit.label}
+                      onClick={() => setSelectedUnit(unit)}
+                      className={`px-4 py-2 border rounded-md text-sm transition-colors ${
+                        selectedUnit?.label === unit.label
+                          ? 'bg-[#251c1a] text-white border-[#251c1a]'
+                          : 'bg-white text-[#251c1a] border-gray-300 hover:border-[#251c1a]'
+                      }`}
+                    >
+                      {unit.label} - ₹{unit.price}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Price Display */}
               {selectedUnit && (
-                 <span className="text-2xl font-bold text-[#251c1a]">₹{selectedUnit.price}</span>
+                <p className="text-2xl font-semibold text-[#b19f84] mb-4">
+                  ₹{selectedUnit.price}
+                </p>
+              )}
+
+              {/* Description */}
+              <div className="mb-4">
+                <h3 className="text-lg font-semibold text-[#251c1a] mb-1">Description</h3>
+                <p className={`text-gray-600 text-sm leading-relaxed ${showFullDescription ? '' : 'line-clamp-3'}`}>
+                  {product.description}
+                </p>
+                {product.description.length > 150 && ( // Only show toggle if description is long
+                  <button
+                    onClick={() => setShowFullDescription(!showFullDescription)}
+                    className="text-sm text-[#b19f84] hover:underline mt-1 flex items-center"
+                  >
+                    {showFullDescription ? 'Show Less' : 'Show More'}
+                    {showFullDescription ? <FaChevronUp className="ml-1" size={12}/> : <FaChevronDown className="ml-1" size={12}/>}
+                  </button>
+                )}
+              </div>
+
+              {/* Stock Info - Added check for undefined stock */}
+              {typeof product.stock !== 'undefined' && (
+                  <p className={`text-sm mb-5 ${product.stock > 0 ? 'text-green-600' : 'text-red-600'}`}>
+                      {product.stock > 0 ? `${product.stock} in stock` : 'Out of stock'}
+                  </p>
               )}
             </div>
-             <p className="text-xs text-gray-500 mt-2">(Inclusive of all taxes)</p>
 
+            {/* Add to Cart Button - Added check for undefined stock */}
+            <button
+              onClick={handleAddToCart}
+              disabled={isAdding || (typeof product.stock !== 'undefined' && product.stock === 0) || !selectedUnit}
+              className="w-full bg-gradient-to-r from-[#251c1a] to-[#3a2e2b] text-white py-3 px-6 rounded-lg font-semibold hover:opacity-90 transition-opacity flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <FaShoppingCart />
+              <span>{isAdding ? 'Adding...' : ((typeof product.stock !== 'undefined' && product.stock === 0) ? 'Out of Stock' : 'Add to Cart')}</span>
+            </button>
           </motion.div>
         </div>
 
-        {/* Review Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.4 }}
-          className="bg-white rounded-lg shadow-md p-6 mt-8" // Added mt-8 for spacing
-        >
-          <h2 className="text-2xl font-bold text-[#251c1a] mb-4">Leave a Review</h2>
-          {/* TODO: Add star rating input here if desired */}
-          <textarea
-            value={reviewText}
-            onChange={handleReviewChange}
-            rows="4"
-            placeholder="Share your thoughts about this product..."
-            className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-[#251c1a]/10 focus:outline-none focus:ring-2 focus:ring-[#251c1a]/20 mb-4"
-          ></textarea>
-          <motion.button
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            onClick={handleSubmitReview}
-            className="bg-[#d97706] text-white px-6 py-2 rounded-lg font-medium shadow-sm hover:shadow-md transition-all duration-300 flex items-center justify-center space-x-2"
-          >
-            <FaPaperPlane />
-            <span>Submit Review</span>
-          </motion.button>
-        </motion.div>
+        {/* --- Customer Reviews Section --- */}
+        <div className="mt-12 bg-white p-6 rounded-lg shadow-md">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-2xl font-bold text-[#251c1a] flex items-center">
+              <FaCommentDots className="mr-2"/> Customer Reviews ({reviews.length})
+            </h2>
+            <button
+              onClick={() => setShowReviewForm(!showReviewForm)}
+              className="flex items-center px-4 py-2 border border-gray-300 rounded-md text-sm text-[#251c1a] hover:bg-gray-50 transition-colors"
+            >
+              {showReviewForm ? <FaTimes className="mr-2"/> : <FaPlus className="mr-2"/>}
+              {showReviewForm ? 'Cancel Review' : 'Write a Review'}
+            </button>
+          </div>
 
-        {/* TODO: Add section to display existing reviews */}
+          {/* --- Review Form (Animated) --- */}
+          <AnimatePresence>
+            {showReviewForm && (
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: 'auto', opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={{ duration: 0.3 }}
+                className="overflow-hidden mb-6 border rounded-lg p-4 bg-gray-50"
+              >
+                <form onSubmit={handleSubmitReview} className="space-y-4">
+                  <h3 className="text-lg font-semibold text-[#251c1a]">Write Your Review</h3>
+                  {/* Name Input (only if not logged in) */}
+                  {!user && (
+                     <div>
+                        <label htmlFor="reviewerName" className="block text-sm font-medium text-gray-700 mb-1">Your Name</label>
+                        <input
+                            type="text"
+                            id="reviewerName"
+                            value={reviewerName}
+                            onChange={handleNameChange}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#b19f84]"
+                            required
+                            placeholder="Enter your name"
+                        />
+                     </div>
+                  )}
+                  {/* Rating Input */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Your Rating <span className="text-red-500">*</span></label>
+                    <div className="flex space-x-1">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <button
+                          key={star}
+                          type="button"
+                          onClick={() => handleRating(star)}
+                          className="focus:outline-none"
+                          aria-label={`Rate ${star} star${star > 1 ? 's' : ''}`}
+                        >
+                          {star <= rating ? (
+                            <FaStar className="text-yellow-500 text-2xl" />
+                          ) : (
+                            <FaRegStar className="text-gray-400 text-2xl hover:text-yellow-400" />
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  {/* Review Text Input */}
+                  <div>
+                    <label htmlFor="reviewText" className="block text-sm font-medium text-gray-700 mb-1">Your Review <span className="text-red-500">*</span></label>
+                    <textarea
+                      id="reviewText"
+                      rows="4"
+                      value={reviewText}
+                      onChange={handleReviewChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#b19f84]"
+                      required
+                      placeholder="Share your thoughts about the product..."
+                    ></textarea>
+                  </div>
+                  {/* Submit Button */}
+                  <div className="flex justify-end">
+                    <button
+                      type="submit"
+                      disabled={isSubmittingReview}
+                      className="flex items-center justify-center px-5 py-2 bg-[#251c1a] text-white rounded-md font-medium hover:bg-[#3a2e2b] transition-colors disabled:opacity-50"
+                    >
+                      <FaPaperPlane className="mr-2" />
+                      {isSubmittingReview ? 'Submitting...' : 'Submit Review'}
+                    </button>
+                  </div>
+                   {reviewError && <p className="text-sm text-red-600 mt-2">{reviewError}</p>}
+                </form>
+              </motion.div>
+            )}
+          </AnimatePresence>
+          {/* --- End Review Form --- */} {/* Corrected comment syntax */}
+
+
+          {/* --- Display Reviews --- */}
+          {loadingReviews && <p className="text-gray-500">Loading reviews...</p>}
+          {!loadingReviews && reviewError && <p className="text-red-500">{reviewError}</p>}
+          {!loadingReviews && !reviewError && reviews.length === 0 && (
+            <p className="text-gray-500">Be the first to review this product!</p>
+          )}
+          {!loadingReviews && !reviewError && reviews.length > 0 && (
+            <div className="space-y-6">
+              {reviews.map((review) => (
+                <motion.div
+                  key={review.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3 }}
+                  className="border-b pb-4 last:border-b-0"
+                >
+                  <div className="flex items-center mb-2">
+                     {/* Simple Initial Circle */}
+                     <div className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center mr-3 text-sm font-semibold text-gray-600">
+                        {review.reviewer_name ? review.reviewer_name.charAt(0).toUpperCase() : '?'}
+                     </div>
+                     <div>
+                        <p className="font-semibold text-[#251c1a]">{review.reviewer_name || 'Anonymous'}</p>
+                        <p className="text-xs text-gray-500">{formatDate(review.created_at)}</p>
+                     </div>
+                  </div>
+                  <div className="flex items-center mb-2">
+                    {renderStars(review.rating)}
+                  </div>
+                  <p className="text-gray-700 text-sm leading-relaxed">{review.text}</p>
+                </motion.div>
+              ))}
+            </div>
+          )}
+          {/* --- End Display Reviews --- */}
+        </div>
+        {/* --- End Customer Reviews Section --- */}
 
       </div>
     </section>

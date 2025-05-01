@@ -180,18 +180,13 @@ function CartPage() {
     }
 
     // Calculate savings (assuming original price needs to be derived or stored)
-    // This is a placeholder - you might need to adjust based on how you store MRP/discounts
     const calculateTotalSavings = () => {
-        // Example: If you had an 'mrp' field on CartItem model/serializer
-        // return cart.items.reduce((total, item) => {
-        //     const mrp = parseFloat(item.mrp || item.price); // Assume mrp if available
-        //     const price = parseFloat(item.price);
-        //     return total + (mrp - price) * item.quantity;
-        // }, 0).toFixed(2);
-        return "22.00"; // Placeholder based on image
+        // Use the value from the cart object if available
+        return cart?.total_savings ? parseFloat(cart.total_savings).toFixed(2) : "0.00";
     };
     const totalSavings = calculateTotalSavings();
-    const itemsTotalMRP = (parseFloat(cart.total_price) + parseFloat(totalSavings)).toFixed(2); // Placeholder calculation
+    // Calculate itemsTotalMRP based on actual total_price and total_savings from cart
+    const itemsTotalMRP = (parseFloat(cart?.total_price || '0') + parseFloat(totalSavings)).toFixed(2);
 
     return (
         <section className="min-h-screen py-20 bg-gray-100 pt-24">
@@ -300,9 +295,11 @@ function CartPage() {
                                 <div className="flex justify-between">
                                     <span className="flex items-center text-gray-600">
                                         <FaFileInvoiceDollar className="mr-2"/> Items total
+                                        {/* Use totalSavings calculated from cart data */}
                                         {parseFloat(totalSavings) > 0 && <span className="ml-2 text-xs bg-blue-100 text-blue-800 px-1.5 py-0.5 rounded">Saved ₹{totalSavings}</span>}
                                     </span>
                                     <span className="text-gray-800">
+                                        {/* Use itemsTotalMRP calculated from cart data */}
                                         {parseFloat(totalSavings) > 0 && <span className="line-through text-gray-400 mr-1">₹{itemsTotalMRP}</span>}
                                         ₹{cart.total_price}
                                     </span>
@@ -333,6 +330,7 @@ function CartPage() {
                             </div>
 
                             {/* Savings Banner (Bottom) */}
+                            {/* Use totalSavings calculated from cart data */}
                             {parseFloat(totalSavings) > 0 && (
                                 <div className="bg-blue-100 text-blue-800 p-3 rounded-lg text-sm font-medium flex justify-between items-center mb-5">
                                     <span>Your total savings</span>

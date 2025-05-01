@@ -61,9 +61,8 @@ function CheckoutPage() {
         try {
             const orderResponse = await placeOrder(selectedPaymentMethod);
             toast.dismiss('placingOrder'); // Dismiss the persistent notification
-            toast.success(<>
-                <FaCheckCircle className="inline mr-2" /> Order Placed Successfully! (ID: {orderResponse.order.id})
-            </>);
+            // Remove the explicit FaCheckCircle icon
+            toast.success(`Order Placed Successfully! (ID: ${orderResponse.order.id})`);
             // Redirect to order history or a success page after a short delay
             setTimeout(() => {
                 navigate('/order-history'); // Redirect to order history page
