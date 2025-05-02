@@ -71,7 +71,8 @@ export const clearCartApi = async () => {
 // Function to update item quantity in the cart
 export const updateCartItemQuantity = async (itemProductId, quantity) => {
     try {
-        const response = await axios.put(`${API_BASE_URL}/cart/item/${itemProductId}/update/`, 
+        // Corrected URL: Removed '/item/' segment
+        const response = await axios.put(`${API_BASE_URL}/cart/update/${itemProductId}/`, 
             { quantity: quantity },
             { headers: getAuthHeaders() }
         );
@@ -85,7 +86,8 @@ export const updateCartItemQuantity = async (itemProductId, quantity) => {
 // Function to remove an item from the cart
 export const removeCartItemApi = async (itemProductId) => {
     try {
-        const response = await axios.delete(`${API_BASE_URL}/cart/item/${itemProductId}/remove/`, {
+        // Corrected URL: Removed '/item/' segment
+        const response = await axios.delete(`${API_BASE_URL}/cart/remove/${itemProductId}/`, {
             headers: getAuthHeaders(),
         });
         return response.data; // Should contain the updated cart and a message
