@@ -123,13 +123,13 @@ function CartPage() {
     };
 
     if (loading) {
-        return <div className="min-h-screen flex items-center justify-center bg-gray-100 pt-20">Loading cart...</div>;
+        return <div className="min-h-screen flex items-center justify-center bg-[#f3eee5] pt-20">Loading cart...</div>; 
     }
 
     // Display error message if cart failed to load
     if (error && !cart) {
         return (
-            <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 pt-20 text-red-600">
+            <div className="min-h-screen flex flex-col items-center justify-center bg-[#f3eee5] pt-20 text-red-600">
                 <p>Error: {error}</p>
                 <button onClick={fetchCart} className="mt-4 px-4 py-2 bg-[#251c1a] text-white rounded hover:bg-[#3a2e2b]">
                     Retry
@@ -141,7 +141,7 @@ function CartPage() {
     // Handle case where cart is loaded but empty
     if (!cart || cart.items.length === 0) {
         return (
-            <section className="min-h-screen py-20 bg-gray-100 pt-24">
+            <section className="min-h-screen py-20 bg-[#f3eee5] pt-24"> 
                 <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl text-center">
                     <motion.div
                         initial={{ opacity: 0, scale: 0.9 }}
@@ -165,7 +165,7 @@ function CartPage() {
 
     // Main cart view
     return (
-        <section className="min-h-screen py-20 bg-gray-100 pt-24">
+        <section className="min-h-screen py-20 bg-[#f3eee5] pt-24"> 
             <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl">
                 <motion.h1
                     initial={{ opacity: 0, y: -20 }}
@@ -199,7 +199,12 @@ function CartPage() {
                                 className="p-4 flex flex-col sm:flex-row items-center justify-between space-y-3 sm:space-y-0"
                             >
                                 <div className="flex items-center space-x-4 flex-grow">
-                                    <img src={getProductImage(item.product)} alt={item.product_name || 'Product'} className="w-16 h-16 object-contain border rounded flex-shrink-0" />
+                                    {/* Use item.image_url if available, otherwise fallback */}
+                                    <img 
+                                        src={item.image_url || getProductImage(item.product)} 
+                                        alt={item.product_name || 'Product'} 
+                                        className="w-16 h-16 object-contain border rounded flex-shrink-0" 
+                                    />
                                     <div>
                                         <p className="font-semibold text-gray-800">{item.product_name || 'Product Name Missing'}</p>
                                         <p className="text-sm text-gray-500">{item.unit_label || 'Unit'}</p>

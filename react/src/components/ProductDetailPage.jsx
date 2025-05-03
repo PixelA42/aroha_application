@@ -130,8 +130,10 @@ function ProductDetailPage() {
         },
         body: JSON.stringify({
           product_id: productIdString, // Send the combined identifier
-          quantity: 1, // Defaulting to 1 for now, adjust if quantity selection is added
-          // Send price and mrp from the *selected unit*
+          // Send name, label, and image URL along with price/mrp
+          product_name: product.name, 
+          unit_label: selectedUnit.label,
+          image_url: product.image, // Assuming product object has the image URL
           price: selectedUnit.price,
           mrp: selectedUnit.mrp // Send MRP from selected unit
         }),

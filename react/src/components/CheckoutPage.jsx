@@ -5,14 +5,6 @@ import { FaShoppingCart, FaCreditCard, FaMoneyBillWave, FaRupeeSign, FaCheckCirc
 import { fetchCartApi, placeOrder } from '../api'; // Assuming api.js is in ../api
 import { toast } from 'react-toastify';
 
-// Placeholder for product images (similar to CartPage)
-const getProductImage = (productIdentifier) => {
-    if (productIdentifier && productIdentifier.startsWith('100')) {
-        return 'https://via.placeholder.com/60x60.png?text=Choco+Bar';
-    }
-    return 'https://via.placeholder.com/60x60.png?text=Product';
-}
-
 function CheckoutPage() {
     const [cart, setCart] = useState(null);
     const [loadingCart, setLoadingCart] = useState(true);
@@ -80,12 +72,12 @@ function CheckoutPage() {
     };
 
     if (loadingCart) {
-        return <div className="min-h-screen flex items-center justify-center bg-gray-100 pt-20">Loading checkout details...</div>;
+        return <div className="min-h-screen flex items-center justify-center bg-[#f3eee5] pt-20">Loading checkout details...</div>; 
     }
 
     if (error && !cart) { // Show error if cart couldn't be loaded
         return (
-            <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 pt-20 text-red-600">
+            <div className="min-h-screen flex flex-col items-center justify-center bg-[#f3eee5] pt-20 text-red-600"> 
                 <p>Error: {error}</p>
                 <button onClick={() => window.location.reload()} className="mt-4 px-4 py-2 bg-[#251c1a] text-white rounded hover:bg-[#3a2e2b]">
                     Retry
@@ -95,11 +87,11 @@ function CheckoutPage() {
     }
 
     if (!cart) { // Should be handled by useEffect redirect, but as a fallback
-        return <div className="min-h-screen flex items-center justify-center bg-gray-100 pt-20">Redirecting...</div>;
+        return <div className="min-h-screen flex items-center justify-center bg-[#f3eee5] pt-20">Redirecting...</div>; 
     }
 
     return (
-        <section className="min-h-screen py-20 bg-gray-100 pt-24">
+        <section className="min-h-screen py-20 bg-[#f3eee5] pt-24"> 
             <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-3xl">
                 <motion.h1
                     initial={{ opacity: 0, y: -20 }}
@@ -124,10 +116,16 @@ function CheckoutPage() {
                             {cart.items.map(item => (
                                 <div key={item.product} className="flex justify-between items-center text-sm">
                                     <div className="flex items-center space-x-2">
-                                        <img src={getProductImage(item.product)} alt={item.product_name} className="w-10 h-10 object-contain border rounded flex-shrink-0" />
+                                        {/* Use item.image_url directly, with a fallback */}
+                                        <img 
+                                            src={item.image_url || 'https://via.placeholder.com/60x60.png?text=N/A'} 
+                                            alt={item.product_name || 'Product'} 
+                                            className="w-10 h-10 object-contain border rounded flex-shrink-0" 
+                                        />
                                         <div>
-                                            <p className="text-gray-800 font-medium">{item.product_name}</p>
-                                            <p className="text-gray-500 text-xs">{item.unit_label} x {item.quantity}</p>
+                                            {/* Ensure product_name and unit_label are displayed */}
+                                            <p className="text-gray-800 font-medium">{item.product_name || 'Product Name Missing'}</p>
+                                            <p className="text-gray-500 text-xs">{item.unit_label || 'Unit'} x {item.quantity}</p>
                                         </div>
                                     </div>
                                     <p className="text-gray-700 font-medium">₹{(item.price * item.quantity).toFixed(2)}</p>

@@ -62,12 +62,12 @@ function OrderHistoryPage() {
     }, [token, navigate]);
 
     if (loading) {
-        return <div className="min-h-screen flex items-center justify-center bg-gray-100 pt-20">Loading order history...</div>;
+        return <div className="min-h-screen flex items-center justify-center bg-[#f3eee5] pt-20">Loading order history...</div>; 
     }
 
     if (error) {
         return (
-            <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 pt-20 text-red-600">
+            <div className="min-h-screen flex flex-col items-center justify-center bg-[#f3eee5] pt-20 text-red-600"> 
                 <p>Error: {error}</p>
                 <button onClick={() => window.location.reload()} className="mt-4 px-4 py-2 bg-[#251c1a] text-white rounded hover:bg-[#3a2e2b]">
                     Retry
@@ -78,7 +78,7 @@ function OrderHistoryPage() {
 
     if (orders.length === 0) {
         return (
-            <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 pt-20">
+            <div className="min-h-screen flex flex-col items-center justify-center bg-[#f3eee5] pt-20"> 
                 <FaClipboardList className="text-6xl text-gray-400 mb-4" />
                 <p className="text-xl text-gray-600 mb-6">You haven't placed any orders yet.</p>
                 <Link to="/categories" className="px-6 py-3 bg-[#251c1a] text-white rounded-lg hover:bg-[#3a2e2b] transition-colors">
@@ -89,7 +89,7 @@ function OrderHistoryPage() {
     }
 
     return (
-        <section className="min-h-screen py-20 bg-gray-100 pt-24">
+        <section className="min-h-screen py-20 bg-[#f3eee5] pt-24"> 
             <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl">
                 <motion.h1
                     initial={{ opacity: 0, y: -20 }}
@@ -131,10 +131,16 @@ function OrderHistoryPage() {
                                 {order.items.map(item => (
                                     <div key={item.id} className="flex items-center justify-between text-sm">
                                         <div className="flex items-center space-x-3">
-                                            <img src={getProductImage(item.product_identifier)} alt={item.product_name} className="w-10 h-10 object-contain border rounded flex-shrink-0" />
+                                            {/* Use item.image_url directly, with a fallback */}
+                                            <img 
+                                                src={item.image_url || 'https://via.placeholder.com/40x40.png?text=N/A'} 
+                                                alt={item.product_name || 'Product'} 
+                                                className="w-10 h-10 object-contain border rounded flex-shrink-0" 
+                                            />
                                             <div>
-                                                <p className="text-gray-800 font-medium">{item.product_name}</p>
-                                                <p className="text-gray-500 text-xs">{item.unit_label} x {item.quantity}</p>
+                                                {/* Ensure product_name and unit_label are displayed */}
+                                                <p className="text-gray-800 font-medium">{item.product_name || 'Product Name Missing'}</p>
+                                                <p className="text-gray-500 text-xs">{item.unit_label || 'Unit'} x {item.quantity}</p>
                                             </div>
                                         </div>
                                         <p className="text-gray-700 font-medium">₹{(item.price * item.quantity).toFixed(2)}</p>
