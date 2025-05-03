@@ -3,6 +3,8 @@ from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
 from rest_framework.views import APIView
 from rest_framework.exceptions import ValidationError
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.authentication import TokenAuthentication
 from .models import User
 from .serializers import UserSerializer, AuthTokenSerializer
 from django.http import HttpResponse
@@ -42,6 +44,18 @@ class SignInView(APIView):
                 "user": UserSerializer(user).data,
                 "is_new_token": created
             }
+        }, status=status.HTTP_200_OK)
+
+class UserDetailView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        serializer = UserSerializer(request.user)
+        return Response({
+            "status": "success",
+            "message": "User details retrieved successfully.",
+            "data": serializer.data
         }, status=status.HTTP_200_OK)
 
 def homepage_view(request):
