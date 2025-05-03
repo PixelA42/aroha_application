@@ -4,53 +4,8 @@ import { FaStar, FaRegStar, FaShoppingCart, FaPlus, FaMinus, FaChevronDown, FaCh
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'react-toastify';
 
-// Placeholder function to get product details by ID - replace with actual data fetching
-const getProductById = (id) => {
-  // Combine all dummy products for searching
-  const allProducts = Object.values(dummyProducts).flat();
-  // Find the product by ID (convert id from URL string to number if necessary)
-  return allProducts.find(p => p.id === parseInt(id));
-};
-
-// Placeholder product data (copied from ProductListPage for now)
-const dummyProducts = {
-  'Handloom Textiles': [
-    { id: 1, name: 'Kanjeevaram Silk Saree', brand: 'Kanchi Weaves', price: 8500, image: 'https://images.unsplash.com/photo-1610189334185-6753343d7c8a?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=60', description: 'Authentic Kanjeevaram silk saree with intricate gold zari work.', units: [{ label: '1 Saree', price: 8500, discount: 10, mrp: 9444 }] },
-    { id: 2, name: 'Banarasi Brocade Dupatta', brand: 'Varanasi Threads', price: 3200, image: 'https://images.unsplash.com/photo-1598136516531-4d3fd7c4d9c1?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=60', description: 'Luxurious Banarasi brocade dupatta with traditional motifs.', units: [{ label: '1 Dupatta', price: 3200, discount: 15, mrp: 3765 }] },
-    { id: 3, name: 'Pashmina Shawl from Kashmir', brand: 'Kashmir Looms', price: 15000, image: 'https://images.unsplash.com/photo-1575439462437-9433759f6f3a?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=60', description: 'Genuine Pashmina shawl, handwoven in Kashmir.', units: [{ label: '1 Shawl', price: 15000, discount: 5, mrp: 15789 }] },
-    { id: 4, name: 'Ikat Cotton Kurta Material', brand: 'Orissa Weavers', price: 1800, image: 'https://images.unsplash.com/photo-1604654894610-df63bc5363cc?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=60', description: 'Authentic Ikat weave cotton material from Odisha.', units: [{ label: '2.5 Meters', price: 1800, discount: 8, mrp: 1956 }] },
-  ],
-  'Handicrafts': [
-    { id: 5, name: 'Wooden Elephant Statue (Rajasthan)', brand: 'Jaipur Carvings', price: 999, image: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=60', description: 'Hand-carved wooden elephant statue showcasing Rajasthani artistry.', units: [{ label: '1 Piece', price: 999, discount: 5, mrp: 1050 }] },
-    { id: 6, name: 'Bidriware Metal Plate (Karnataka)', brand: 'Bidar Metals', price: 2500, image: 'https://images.unsplash.com/photo-1589998059171-988d887df646?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=60', description: 'Traditional Bidriware plate with intricate silver inlay.', units: [{ label: '1 Plate', price: 2500, discount: 10, mrp: 2778 }] },
-    { id: 7, name: 'Madhubani Painting on Canvas (Bihar)', brand: 'Mithila Arts', price: 4500, image: 'https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=60', description: 'Vibrant Madhubani painting depicting folk themes.', units: [{ label: '1 Canvas (12x18 in)', price: 4500, discount: 12, mrp: 5114 }] },
-    { id: 8, name: 'Blue Pottery Vase (Jaipur)', brand: 'Jaipur Blue Pottery', price: 1200, image: 'https://images.unsplash.com/photo-1549492423-400259a5e5a4?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=60', description: 'Elegant blue pottery vase with traditional floral motifs.', units: [{ label: '1 Vase (8 inch)', price: 1200, discount: 7, mrp: 1290 }] },
-  ],
-  'Ayurvedic Products': [
-    { id: 9, name: 'Neem & Tulsi Face Wash', brand: 'Veda Essentials', price: 250, image: 'https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=60', description: 'Gentle face wash with the goodness of Neem and Tulsi.', units: [{ label: '100 ml', price: 250, discount: 10, mrp: 278 }] },
-    { id: 10, name: 'Ashwagandha Herbal Supplement', brand: 'Himalayan Herbs', price: 450, image: 'https://images.unsplash.com/photo-1604187351543-ab4e4e0e9c49?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=60', description: 'Pure Ashwagandha root powder for stress relief and vitality.', units: [{ label: '60 Capsules', price: 450, discount: 15, mrp: 529 }] },
-  ],
-  'Indian Spices & Masalas': [
-    { id: 11, name: 'Kerala Cardamom (Elaichi)', brand: 'Malabar Spices', price: 300, image: 'https://images.unsplash.com/photo-1558985250-27a406cd498f?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=60', description: 'Aromatic green cardamom sourced directly from Kerala.', units: [{ label: '50 g', price: 300, discount: 5, mrp: 316 }] },
-    { id: 12, name: 'Kashmiri Saffron (Kesar)', brand: 'Pampore Fields', price: 800, image: 'https://images.unsplash.com/photo-1598680039024-f97c185b8414?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=60', description: 'Premium quality Kashmiri saffron threads.', units: [{ label: '1 g', price: 800, discount: 10, mrp: 889 }] },
-    { id: 13, name: 'Garam Masala Blend', brand: 'Spice Heritage', price: 150, image: 'https://images.unsplash.com/photo-1512781737819-de14a1eac941?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=60', description: 'Traditional blend of aromatic Indian spices.', units: [{ label: '100 g', price: 150, discount: 8, mrp: 163 }] },
-  ],
-  'Ethnic Jewelry': [
-      { id: 14, name: 'Kundan Necklace Set', brand: 'Rajwada Jewels', price: 5500, image: 'https://images.unsplash.com/photo-1588444968576-f8fe92ce56fd?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=60', description: 'Exquisite Kundan necklace set with matching earrings.', units: [{ label: '1 Set', price: 5500, discount: 20, mrp: 6875 }] },
-      { id: 15, name: 'Silver Jhumka Earrings', brand: 'Temple Trinkets', price: 1800, image: 'https://images.unsplash.com/photo-1611930022073-b7a4ba5f4c4a?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=60', description: 'Classic silver jhumka earrings with intricate detailing.', units: [{ label: '1 Pair', price: 1800, discount: 10, mrp: 2000 }] },
-  ],
-  'Home Decor': [
-      { id: 16, name: 'Brass Diya Lamp', brand: 'Divine Decor', price: 750, image: 'https://images.unsplash.com/photo-1601121141499-17ae80afc03a?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=60', description: 'Traditional brass Diya lamp for auspicious occasions.', units: [{ label: '1 Piece', price: 750, discount: 5, mrp: 789 }] },
-      { id: 17, name: 'Toran Door Hanging', brand: 'Gujarat Handicrafts', price: 900, image: 'https://images.unsplash.com/photo-1593079614110-5f1e4f6a7a4c?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=60', description: 'Colorful embroidered Toran for decorating doorways.', units: [{ label: '1 Piece', price: 900, discount: 10, mrp: 1000 }] },
-  ],
-  'Hershey\'s Cookies n Creme': [ // Example based on image - Replaced with fictional brand
-    { id: 100, name: 'Cookies n Creme Chocolate Bar', brand: 'Malabar Cocoa', price: 128, image: 'https://via.placeholder.com/600x400.png?text=Choco+Bar', description: 'Creamy white chocolate with crunchy cookie pieces.', deliveryTime: 'Delivery in 3 days', units: [ // Changed delivery time here
-        { label: '100 g', price: 128, discount: 14, mrp: 150 },
-        { label: '2 x 100 g', price: 252, discount: 16, mrp: 300 }
-      ]
-    }
-  ]
-};
+// Import the updated getProductById function from ProductListPage
+import { getProductById } from './ProductListPage'; // Adjust path if necessary
 
 function ProductDetailPage() {
   const { productId } = useParams();
@@ -76,7 +31,7 @@ function ProductDetailPage() {
   const user = JSON.parse(localStorage.getItem('user')); // Get user info
   const token = localStorage.getItem('token'); // Get auth token
 
-  // Fetch Product Details
+  // Fetch Product Details - Uses imported getProductById now
   useEffect(() => {
     const fetchProduct = async () => {
       setLoading(true);
@@ -85,15 +40,24 @@ function ProductDetailPage() {
         // Simulate network delay
         await new Promise(resolve => setTimeout(resolve, 500));
 
-        // --- Use the existing getProductById function --- 
+        // --- Use the IMPORTED getProductById function ---
         const fetchedProduct = getProductById(productId);
-        // --- End of Reverted Logic --- 
+        // --- End of Updated Logic ---
 
         if (fetchedProduct) {
           setProduct(fetchedProduct);
           // Default to the first unit if available
-          if (fetchedProduct.units && fetchedProduct.units.length > 0) {
+          // Ensure units exist and is an array before accessing
+          if (fetchedProduct.units && Array.isArray(fetchedProduct.units) && fetchedProduct.units.length > 0) {
             setSelectedUnit(fetchedProduct.units[0]);
+          } else if (!fetchedProduct.units) {
+            // Handle cases where product might not have units defined (use base price/mrp if available)
+            // This sets a default selectedUnit structure for products without explicit units
+             setSelectedUnit({
+                label: 'Standard', // Or some default label
+                price: fetchedProduct.price,
+                mrp: fetchedProduct.mrp || fetchedProduct.price // Use price if mrp is missing
+             });
           }
         } else {
           setError('Product not found.');
@@ -139,9 +103,10 @@ function ProductDetailPage() {
 
   // --- Handle Add to Cart ---
   const handleAddToCart = async () => {
-    // ... (existing handleAddToCart logic remains the same) ...
+    // Ensure product and selectedUnit are loaded, and not already adding
     if (!product || !selectedUnit || isAdding) {
-      return; // Don't proceed if product/unit not selected or already adding
+      toast.warn("Please select a unit before adding to cart."); // More specific warning
+      return;
     }
 
     const token = localStorage.getItem('token');
@@ -154,7 +119,9 @@ function ProductDetailPage() {
     setIsAdding(true);
     try {
       // Use product.id which should be correctly set now
-      const productIdString = `${product.id}_${selectedUnit.label}`;
+      // The product_id sent to backend should uniquely identify the product *variant* (product + unit)
+      const productIdString = `${product.id}_${selectedUnit.label}`; // Example: "2_Standard"
+
       const response = await fetch('http://127.0.0.1:8000/api/cart/add/', { // Use your backend URL
         method: 'POST',
         headers: {
@@ -162,12 +129,11 @@ function ProductDetailPage() {
           'Authorization': `Token ${token}`,
         },
         body: JSON.stringify({
-          product_id: productIdString, // Combine product ID and unit label
+          product_id: productIdString, // Send the combined identifier
           quantity: 1, // Defaulting to 1 for now, adjust if quantity selection is added
-          product_name: product.name,
-          unit_label: selectedUnit.label,
+          // Send price and mrp from the *selected unit*
           price: selectedUnit.price,
-          mrp: selectedUnit.mrp // <-- Add this line to send MRP
+          mrp: selectedUnit.mrp // Send MRP from selected unit
         }),
       });
 
@@ -343,12 +309,12 @@ function ProductDetailPage() {
           >
             <div>
               <h1 className="text-3xl font-bold text-[#251c1a] mb-2">{product.name}</h1>
+              {/* UPDATED: Display Category and Brand, Removed Origin */}
               <div className="flex items-center space-x-2 mb-4 text-sm text-gray-500">
-                <span>Category: {product.category}</span>
-                <span>|</span>
-                <span>Brand: {product.brand}</span>
-                <span>|</span>
-                <span>Origin: {product.origin}</span>
+                {product.category && <span>Category: {product.category}</span>}
+                {product.category && product.brand && <span>|</span>}
+                {product.brand && <span>Brand: {product.brand}</span>}
+                {/* Removed Origin Span */}
               </div>
 
               {/* Average Rating Display */}
@@ -359,47 +325,70 @@ function ProductDetailPage() {
                 </div>
               )}
 
-              {/* Unit Selection */}
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-1">Select Unit:</label>
-                <div className="flex flex-wrap gap-2">
-                  {product.units.map((unit) => (
-                    <button
-                      key={unit.label}
-                      onClick={() => setSelectedUnit(unit)}
-                      className={`px-4 py-2 border rounded-md text-sm transition-colors ${
-                        selectedUnit?.label === unit.label
-                          ? 'bg-[#251c1a] text-white border-[#251c1a]'
-                          : 'bg-white text-[#251c1a] border-gray-300 hover:border-[#251c1a]'
-                      }`}
-                    >
-                      {unit.label} - ₹{unit.price}
-                    </button>
-                  ))}
+              {/* Unit Selection - Ensure product.units is checked */}
+              {Array.isArray(product.units) && product.units.length > 0 && (
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Select Unit:</label>
+                  <div className="flex flex-wrap gap-2">
+                    {product.units.map((unit) => (
+                      <button
+                        key={unit.label}
+                        onClick={() => setSelectedUnit(unit)}
+                        className={`px-4 py-2 border rounded-md text-sm transition-colors ${
+                          selectedUnit?.label === unit.label
+                            ? 'bg-[#251c1a] text-white border-[#251c1a]'
+                            : 'bg-white text-[#251c1a] border-gray-300 hover:border-[#251c1a]'
+                        }`}
+                      >
+                        {unit.label} - ₹{unit.price}
+                        {/* Optionally show MRP/Discount */}
+                        {unit.mrp && unit.mrp > unit.price && (
+                            <span className="ml-2 text-xs line-through text-gray-400">₹{unit.mrp}</span>
+                        )}
+                      </button>
+                    ))}
+                  </div>
                 </div>
-              </div>
-
-              {/* Price Display */}
-              {selectedUnit && (
-                <p className="text-2xl font-semibold text-[#b19f84] mb-4">
-                  ₹{selectedUnit.price}
-                </p>
               )}
+
+              {/* Price Display - Updated logic to handle selectedUnit */}
+              <p className="text-2xl font-semibold text-[#b19f84] mb-1">
+                ₹{selectedUnit ? selectedUnit.price : product.price}
+                {/* Show MRP if available and different */}
+                {selectedUnit && selectedUnit.mrp && selectedUnit.mrp > selectedUnit.price && (
+                    <span className="ml-2 text-base line-through text-gray-400 font-normal">₹{selectedUnit.mrp}</span>
+                )}
+                 {/* Show Discount Percentage */}
+                 {selectedUnit && selectedUnit.mrp && selectedUnit.mrp > selectedUnit.price && (
+                    <span className="ml-3 text-sm font-medium text-green-600">
+                        ({Math.round(((selectedUnit.mrp - selectedUnit.price) / selectedUnit.mrp) * 100)}% off)
+                    </span>
+                 )}
+              </p>
+              <p className="text-xs text-gray-500 mb-4">incl. of all taxes</p>
 
               {/* Description */}
               <div className="mb-4">
                 <h3 className="text-lg font-semibold text-[#251c1a] mb-1">Description</h3>
-                <p className={`text-gray-600 text-sm leading-relaxed ${showFullDescription ? '' : 'line-clamp-3'}`}>
-                  {product.description}
-                </p>
-                {product.description.length > 150 && ( // Only show toggle if description is long
-                  <button
-                    onClick={() => setShowFullDescription(!showFullDescription)}
-                    className="text-sm text-[#b19f84] hover:underline mt-1 flex items-center"
-                  >
-                    {showFullDescription ? 'Show Less' : 'Show More'}
-                    {showFullDescription ? <FaChevronUp className="ml-1" size={12}/> : <FaChevronDown className="ml-1" size={12}/>}
-                  </button>
+                {/* Add check for product.description */}
+                {product.description ? (
+                  <>
+                    <p className={`text-gray-600 text-sm leading-relaxed ${showFullDescription ? '' : 'line-clamp-3'}`}>
+                      {product.description}
+                    </p>
+                    {/* Only show toggle if description exists and is long */}
+                    {product.description.length > 150 && (
+                      <button
+                        onClick={() => setShowFullDescription(!showFullDescription)}
+                        className="text-sm text-[#b19f84] hover:underline mt-1 flex items-center"
+                      >
+                        {showFullDescription ? 'Show Less' : 'Show More'}
+                        {showFullDescription ? <FaChevronUp className="ml-1" size={12}/> : <FaChevronDown className="ml-1" size={12}/>}
+                      </button>
+                    )}
+                  </>
+                ) : (
+                  <p className="text-gray-500 text-sm italic">No description available.</p> // Placeholder for missing description
                 )}
               </div>
 
@@ -411,14 +400,14 @@ function ProductDetailPage() {
               )}
             </div>
 
-            {/* Add to Cart Button - Added check for undefined stock */}
+            {/* Add to Cart Button - Ensure selectedUnit is required */}
             <button
               onClick={handleAddToCart}
-              disabled={isAdding || (typeof product.stock !== 'undefined' && product.stock === 0) || !selectedUnit}
+              disabled={isAdding || (typeof product.stock !== 'undefined' && product.stock === 0) || !selectedUnit} // Disable if no unit selected
               className="w-full bg-gradient-to-r from-[#251c1a] to-[#3a2e2b] text-white py-3 px-6 rounded-lg font-semibold hover:opacity-90 transition-opacity flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <FaShoppingCart />
-              <span>{isAdding ? 'Adding...' : ((typeof product.stock !== 'undefined' && product.stock === 0) ? 'Out of Stock' : 'Add to Cart')}</span>
+              <span>{isAdding ? 'Adding...' : ((typeof product.stock !== 'undefined' && product.stock === 0) ? 'Out of Stock' : (!selectedUnit ? 'Select Unit' : 'Add to Cart'))}</span>
             </button>
           </motion.div>
         </div>
