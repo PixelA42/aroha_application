@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from 'react-router-dom'
 import Navbar from './components/Navbar'
 import Hero from './components/Hero'
-import About from './components/About'
+import Recommendations from './components/About' // Updated import name
 import FAQ from './components/FAQ'
 import Services from './components/Services'
 import Footer from './components/Footer'
@@ -98,8 +98,8 @@ function MainContent() {
 						<section id="services">
 							<Services />
 						</section>
-						<section id="about">
-							<About />
+						<section id="about"> {/* Keep the section ID if needed for scrolling */}
+							<Recommendations /> {/* Use the renamed component */}
 						</section>
 						<section id="testimonials">
 							<Testimonials />
