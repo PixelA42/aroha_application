@@ -32,6 +32,7 @@ class OrderItem(models.Model):
     product_identifier = models.CharField(max_length=255) # Matches CartItem's product field
     product_name = models.CharField(max_length=255) # Store name for easier display
     unit_label = models.CharField(max_length=50, blank=True, null=True) # Store unit label
+    image_url = models.URLField(max_length=500, blank=True, null=True) # Store image URL
     quantity = models.PositiveIntegerField()
     price = models.DecimalField(max_digits=10, decimal_places=2) # Price per unit at time of order
 

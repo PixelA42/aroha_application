@@ -4,17 +4,26 @@ from decimal import Decimal # Import Decimal
 
 class CartItemSerializer(serializers.ModelSerializer):
     total_item_price = serializers.ReadOnlyField() # Use the model property
+    # Add product_name and unit_label
+    product_name = serializers.CharField(read_only=True)
+    unit_label = serializers.CharField(read_only=True, allow_null=True)
+    image_url = serializers.URLField(read_only=True, allow_null=True) # Add image_url
 
     class Meta:
         model = CartItem
         fields = [
-            'id', 
+            'id',
             'product', # The identifier string
-            'quantity', 
-            'price', 
-            'total_item_price'
+            'product_name', # Added for display
+            'unit_label', # Added for display
+            'image_url', # Added for display
+            'quantity',
+            'price',
+            'mrp', # Include MRP if needed in cart item view
+            'total_item_price',
+            'item_savings' # Include savings if needed
         ]
-        read_only_fields = [] # Or remove this line if no fields are strictly read-only for the serializer
+        # No need for read_only_fields = [] if all writable fields are listed above
 
 class CartSerializer(serializers.ModelSerializer):
     items = CartItemSerializer(many=True, read_only=True)

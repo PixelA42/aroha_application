@@ -11,7 +11,10 @@ class Cart(models.Model):
 
 class CartItem(models.Model):
     cart = models.ForeignKey(Cart, related_name='items', on_delete=models.CASCADE)
-    product = models.CharField(max_length=255)
+    product = models.CharField(max_length=255) # Product identifier (e.g., SKU or ID)
+    product_name = models.CharField(max_length=255, default='Unknown Product') # Store name for display
+    unit_label = models.CharField(max_length=50, blank=True, null=True) # Store unit label for display
+    image_url = models.URLField(max_length=500, blank=True, null=True) # Store image URL for display
     quantity = models.PositiveIntegerField(default=1)
     price = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal('0.00')) # Price at time of adding
     mrp = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True) # Add MRP field
@@ -29,4 +32,5 @@ class CartItem(models.Model):
 
     def __str__(self):
         mrp_str = f" (MRP: {self.mrp})" if self.mrp else ""
-        return f"{self.quantity} x {self.product} @ {self.price}{mrp_str} in Cart ({self.cart.id})"
+        # Use product_name for display
+        return f"{self.quantity} x {self.product_name} @ {self.price}{mrp_str} in Cart ({self.cart.id})"

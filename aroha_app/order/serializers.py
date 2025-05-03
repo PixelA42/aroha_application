@@ -5,7 +5,7 @@ from register_user.serializers import UserSerializer # Assuming you have this
 class OrderItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = OrderItem
-        fields = ['id', 'product_identifier', 'product_name', 'unit_label', 'quantity', 'price', 'total_item_price']
+        fields = ['id', 'product_identifier', 'product_name', 'unit_label', 'image_url', 'quantity', 'price', 'total_item_price'] # Added image_url
 
 class OrderSerializer(serializers.ModelSerializer):
     items = OrderItemSerializer(many=True, read_only=True)

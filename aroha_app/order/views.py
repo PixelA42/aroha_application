@@ -50,6 +50,7 @@ class PlaceOrderView(views.APIView):
                             product_identifier=item.product, # Use the identifier string
                             product_name=getattr(item, 'product_name', 'Unknown Product'), # Get name if available
                             unit_label=getattr(item, 'unit_label', ''), # Get label if available
+                            image_url=getattr(item, 'image_url', None), # <<< ADD THIS LINE
                             quantity=item.quantity,
                             price=item.price # Price at the time of adding to cart
                         )

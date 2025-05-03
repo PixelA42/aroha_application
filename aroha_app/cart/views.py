@@ -22,13 +22,16 @@ def add_to_cart(request):
     try:
         data = request.data
         product_id = data.get('product_id') # This is likely the identifier string
+        product_name = data.get('product_name', 'Unknown Product') # Get product name
+        unit_label = data.get('unit_label') # Get unit label
+        image_url = data.get('image_url') # Get image URL
         quantity = int(data.get('quantity', 1))
         price = data.get('price') # Price at the time of adding
         mrp = data.get('mrp') # Get MRP from request data
 
         # Validate required fields from request
-        if not product_id or price is None: # MRP is optional for savings calculation, but price is needed
-            return Response({'error': 'Missing product_id or price'}, status=status.HTTP_400_BAD_REQUEST)
+        if not product_id or price is None or not product_name: # MRP is optional for savings calculation, but price is needed
+            return Response({'error': 'Missing product_id, product_name, or price'}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
             price_decimal = Decimal(price)
@@ -39,18 +42,28 @@ def add_to_cart(request):
         cart, created = Cart.objects.get_or_create(user=request.user)
 
         # Use the product_id string directly for the CharField 'product'
-        # Include mrp in defaults
+        # Include mrp, product_name, unit_label, image_url in defaults
         cart_item, item_created = CartItem.objects.get_or_create(
             cart=cart,
             product=str(product_id), # Use the product_id string here
-            defaults={'quantity': quantity, 'price': price_decimal, 'mrp': mrp_decimal} # Add mrp to defaults
+            defaults={
+                'quantity': quantity, 
+                'price': price_decimal, 
+                'mrp': mrp_decimal, 
+                'product_name': product_name, # Save product name
+                'unit_label': unit_label, # Save unit label
+                'image_url': image_url # Save image URL
+            }
         )
 
         if not item_created:
             cart_item.quantity += quantity
-            # Decide if price/mrp should be updated if item already exists
-            # cart_item.price = price_decimal # Uncomment if price should update
-            # cart_item.mrp = mrp_decimal # Uncomment if MRP should update
+            # Decide if price/mrp/name/image should be updated if item already exists
+            cart_item.price = price_decimal # Uncommented: Update price if item exists
+            cart_item.mrp = mrp_decimal # Uncommented: Update MRP if item exists
+            cart_item.product_name = product_name # Uncommented: Update name if item exists
+            cart_item.unit_label = unit_label # Uncommented: Update label if item exists
+            cart_item.image_url = image_url # Uncommented: Update image if item exists
             cart_item.save()
             status_code = status.HTTP_200_OK
             message = 'Item quantity updated in cart'
