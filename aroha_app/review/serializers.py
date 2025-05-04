@@ -20,7 +20,7 @@ class ReviewSerializer(serializers.ModelSerializer):
             'user_username', # Display username
             'reviewer_name',
             'rating',
-            'text',
+            'comment',  # changed from 'text' to 'comment'
             'created_at'
         ]
         read_only_fields = ['id', 'created_at', 'user'] # User is set based on request
