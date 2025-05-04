@@ -42,12 +42,12 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'register_user.apps.RegisterUserConfig',
     'contactaroha.apps.ContactarohaConfig',
-    'cart.apps.CartConfig',  # Add the cart app here
+    'cart.apps.CartConfig',  
     'rest_framework',  # Django REST Framework for API development
     'rest_framework.authtoken',  # Token authentication for DRF
     'corsheaders', 
-    'review.apps.ReviewConfig',  # Add the review app here
-    'order.apps.OrderConfig',  # Add the order app here
+    'review.apps.ReviewConfig',  
+    'order.apps.OrderConfig',  
 ]
 
 MIDDLEWARE = [

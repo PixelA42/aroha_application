@@ -25,7 +25,8 @@ class Order(models.Model):
     # billing_address = models.TextField(blank=True, null=True)
 
     def __str__(self):
-        return f"Order {self.id} by {self.user.username} - {self.status}"
+        # Make absolutely sure this line uses .email
+        return f"Order {self.id} by {self.user.email} - {self.status}"
 
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, related_name='items', on_delete=models.CASCADE)
