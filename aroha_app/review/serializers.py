@@ -42,6 +42,10 @@ class ReviewSerializer(serializers.ModelSerializer):
         if 'rating' not in data:
              raise serializers.ValidationError({"rating": "This field is required."})
 
+        # Ensure comment is provided and not empty
+        if 'comment' not in data or not str(data['comment']).strip():
+            raise serializers.ValidationError({"comment": "This field is required."})
+
         # Check if authenticated user has already reviewed this product
         if request and request.user.is_authenticated:
             product_identifier = data.get('product_identifier')

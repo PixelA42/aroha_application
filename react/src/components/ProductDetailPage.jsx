@@ -191,7 +191,7 @@ function ProductDetailPage() {
     const reviewData = {
         product_identifier: product.id.toString(), // Use the actual product ID
         rating: rating,
-        text: reviewText,
+        comment: reviewText, // <-- FIXED: use 'comment' instead of 'text'
         // Only include reviewer_name if the user is not logged in
         ...( !user && { reviewer_name: reviewerName.trim() } )
     };
@@ -448,6 +448,7 @@ function ProductDetailPage() {
                         <input
                             type="text"
                             id="reviewerName"
+                            name="reviewerName"
                             value={reviewerName}
                             onChange={handleNameChange}
                             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-[#b19f84]"
@@ -482,6 +483,7 @@ function ProductDetailPage() {
                     <label htmlFor="reviewText" className="block text-sm font-medium text-gray-700 mb-1">Your Review <span className="text-red-500">*</span></label>
                     <textarea
                       id="reviewText"
+                      name="reviewText"
                       rows="4"
                       value={reviewText}
                       onChange={handleReviewChange}
@@ -538,7 +540,8 @@ function ProductDetailPage() {
                   <div className="flex items-center mb-2">
                     {renderStars(review.rating)}
                   </div>
-                  <p className="text-gray-700 text-sm leading-relaxed">{review.text}</p>
+                  {/* Change review.text to review.comment */}
+                  <p className="text-gray-700 text-sm leading-relaxed">{review.comment}</p>
                 </motion.div>
               ))}
             </div>
